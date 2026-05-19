@@ -1,0 +1,37 @@
+# Data — too large for git
+data/raw/
+data/processed/
+
+# Trained model weights
+models/
+*.h5
+*.pt
+*.pth
+*.pkl
+*.joblib
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs & outputs
+*.log
+mlruns/
+wandb/
