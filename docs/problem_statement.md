@@ -7,7 +7,15 @@
 
 The Sundarbans, spanning India and Bangladesh, is the world's largest mangrove forest and the primary habitat of the **Bengal Tiger (Panthera tigris tigris)**. As of 2023, approximately **500+ tigers** inhabit this region, making it one of the most critical tiger conservation zones globally.
 
-Wildlife authorities rely on **camera traps** — motion-triggered cameras placed throughout the forest — to monitor tiger populations. However, this generates thousands of images daily that require **manual review**, creating a significant bottleneck in conservation monitoring.
+Wildlife authorities rely on **camera traps** — motion-triggered cameras placed throughout the forest — to monitor tiger populations. However, this generates thousands of images that require **manual review**, creating a significant bottleneck in conservation monitoring.
+
+### How This Project Came to Be
+
+Through our group member **Mr. Anamitra Lahiri**, Group 4 has established a direct connection with the **Programme Director, Wildlife Department, Government of West Bengal**. The department is actively exploring AI/ML to modernise their tiger enumeration processes and has expressed strong interest in this project.
+
+The department possesses approximately **~1 TB of historical camera trap image data** (with potential for more). Regulatory permissions are obtainable. No data masking or anonymisation constraints apply.
+
+**Faculty Supervisor:** Dr. Sowmya S, Associate Professor, IIM Lucknow (sowmya@iiml.ac.in)
 
 ---
 
@@ -70,4 +78,29 @@ This project directly contributes to **wildlife conservation at scale** — a re
 
 ---
 
-*Last updated: 2026-05-19 | Group 4 | EPAIB Batch 05 | IIM Lucknow*
+## Why This Project Matters
+
+> This initiative has strong real-world and commercial potential, with applications across wildlife conservation efforts in India. If successful, it could significantly enhance the accuracy and efficiency of tiger population monitoring on a national scale.
+
+**Impact at scale:**
+- Replace manual image review across Sundarbans (~1TB of images)
+- Potential deployment to **all tiger reserves across India**
+- Contribute to national tiger census accuracy
+- Enable real-time monitoring and early alert systems
+
+---
+
+## Mentor Request (Deep Learning & CV Expert)
+
+We are seeking mentorship from a Deep Learning and Computer Vision expert. Specifically we need guidance on:
+
+| Area | What We Need |
+|------|-------------|
+| Problem structuring | Validate our approach and scope |
+| Model selection | Architecture decisions — CNN vs transformer vs hybrid |
+| Execution roadmap | Best practices, pitfalls to avoid |
+| Periodic reviews | Feedback at key milestones |
+
+---
+
+*Last updated: 2026-05-23 | Group 4 | EPAIB Batch 05 | IIM Lucknow*

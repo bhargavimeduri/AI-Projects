@@ -13,16 +13,18 @@ The Sundarbans is home to the world's largest population of Bengal Tigers. This 
 
 ## Problem Statement
 
-Manual monitoring of tiger populations in the Sundarbans is:
-- **Time-intensive** — rangers review thousands of camera trap images manually
-- **Error-prone** — fatigue leads to missed detections
-- **Not scalable** — coverage is limited by human capacity
+Through our group member **Mr. Anamitra Lahiri**, we have established a direct connection with the **Programme Director, Wildlife Department, Government of West Bengal**. The department is actively exploring AI/ML to improve tiger enumeration in the Sundarbans Tiger Reserve.
 
-**Our Solution:** An automated deep learning pipeline that:
-1. Detects tiger presence in camera trap images
-2. Identifies individual tigers by stripe patterns
-3. Tracks population count over time
-4. Flags unusual behaviour for ranger follow-up
+Currently, the forest department relies on **manually analysing thousands of camera trap images** to identify individual tigers by stripe patterns. This is:
+- **Time-intensive** — thousands of images reviewed by hand
+- **Labour-intensive** — significant ranger effort diverted from field work
+- **Error-prone** — fatigue and human bias affect accuracy
+
+**Our Solution:** A Computer Vision-based system that:
+1. **Detects** tigers automatically from camera trap images
+2. **Identifies** individual tigers using stripe pattern recognition
+3. **Estimates** population accurately and efficiently
+4. **Scales** nationally across all tiger reserves in India
 
 ---
 
@@ -118,15 +120,18 @@ jupyter notebook notebooks/01_data_exploration.ipynb
 
 ---
 
-## Dataset
+## Data & Feasibility
 
-| Source | Description |
-|--------|-------------|
-| [Wildlife Protection Society of India](https://www.wpsi-india.org) | Camera trap images |
-| [Kaggle — Tiger Detection Dataset](https://www.kaggle.com) | Labelled tiger images |
-| [iNaturalist](https://www.inaturalist.org) | Open wildlife image repository |
+| Item | Detail |
+|------|--------|
+| **Source** | Wildlife Department, Government of West Bengal |
+| **Volume** | ~1 TB of historical camera trap images (with potential for more) |
+| **Regulatory** | Permissions obtainable from the Government |
+| **Constraints** | No masking or anonymisation required |
+| **Connection** | Via group member Mr. Anamitra Lahiri (direct govt. contact) |
+| **Deployment** | Real-world deployment potential — scalable across India |
 
-> Raw data is not committed to this repo due to size. See `docs/dataset_guide.md` for download instructions.
+> Raw data is NOT committed to this repo due to size. See `docs/dataset_guide.md` for structure and access details.
 
 ---
 
