@@ -265,7 +265,7 @@ AI-Projects / EPAIB-Group-4 branch
 | Institution | IIM Lucknow |
 | Batch | 05 |
 | Group | 4 |
-| Project Lead | Bhargavi Meduri |
+| Group | 4 — Collaborative Project |
 
 ---
 
