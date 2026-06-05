@@ -265,7 +265,21 @@ AI-Projects / EPAIB-Group-4 branch
 | Institution | IIM Lucknow |
 | Batch | 05 |
 | Group | 4 |
-| Group | 4 — Collaborative Project |
+
+## Team — Group 4
+
+| # | Name |
+|---|---|
+| 1 | Mayank Tandon |
+| 2 | Kuldeep Jain |
+| 3 | Bhargavi Meduri |
+| 4 | Anamitra Lahiri |
+| 5 | Yeshvir Singh |
+| 6 | Ashish |
+| 7 | Sumani Goyal |
+| 8 | Amit |
+| 9 | Muthu |
+| 10 | Srinivasa Murthy |
 
 ---
 
