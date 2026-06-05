@@ -115,7 +115,7 @@ This is the section professors most often ask about in vivas. Be ready to justif
 |---|---|---|---|---|
 | **Sundarbans Training Set** | Collected by Group 4 | 187 images | Primary training/validation dataset | No (manually curated) |
 | **ATRW — Amur Tiger Train** | ICCV Wildlife CV Challenge | 3,392 images | Large-scale validation and pipeline testing | Yes — `reid_list_train.csv` (92 unique tigers) |
-| **Test Bh (Amur Tigers)** | Subset acquired by Bhargavi | 35 images | Cross-dataset generalisation test | Partial |
+| **Test Bh (Amur Tigers)** | Subset acquired by Group 4 | 35 images | Cross-dataset generalisation test | Partial |
 | **ImageNet** | Stanford Vision Lab | 14M images (used via pretrained ResNet50) | Transfer learning base — includes tiger class | Yes (1,000 classes) |
 
 **Dataset documentation must include:**
@@ -258,4 +258,3 @@ Group4_TRACE_TigerEnumeration/
 ---
 
 *Last updated: 2026-06-02 | EPAIB Batch 05, Group 4, IIM Lucknow*
-*Checklist owner: Bhargavi Meduri*

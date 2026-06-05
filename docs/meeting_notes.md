@@ -23,7 +23,7 @@
 | Source dataset from Kaggle/iNaturalist | [Name] | [Date] |
 | Set up virtual environment & test requirements.txt | All | [Date] |
 | Review architecture.md and suggest changes | All | [Date] |
-| Fill in team member details in README.md | Bhargavi | [Date] |
+| Fill in team member details in README.md | All | [Date] |
 
 **Next Meeting:** [Date & Time]
 
@@ -31,7 +31,7 @@
 
 ### Meeting 2 — Pipeline Build Sprint
 **Date:** 2026-05-30
-**Attendees:** Group 4 (Bhargavi Meduri + teammates)
+**Attendees:** Group 4
 **Agenda:** Review what has been built, prepare for Sowmya mam review
 
 ---
