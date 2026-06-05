@@ -128,19 +128,35 @@ source venv/bin/activate       # Linux/Mac
 pip install -r requirements.txt
 ```
 
-### Run on your dataset
+### Training (run once before inference on a new dataset)
 
 ```bash
-# Run on a folder of images (batch mode)
+# Stage 1 — Fine-tune YOLOv8 on your labeled tiger images
+py -3 src/tiger_ai_ultimate.py --train --stage yolo --data-yaml data/tiger_dataset.yaml
+
+# Stage 2 — Train ResNet50 Tiger/No-Tiger binary classifier
+py -3 src/tiger_ai_ultimate.py --train --stage detection --train-data data/processed
+
+# Stage 3 — Fine-tune EfficientNetB3 for individual tiger identification
+py -3 src/tiger_ai_ultimate.py --train --stage identification --train-data data/processed --num-tigers 50
+```
+
+> **Note:** Stages 2 and 3 require TensorFlow (`pip install tensorflow`).
+> Inference (below) runs on PyTorch only — TensorFlow is not needed for inference.
+
+### Inference (run on any image folder)
+
+```bash
+# Batch run on a folder of images
 py -3 src/tiger_ai_ultimate.py --data "path/to/your/images"
 
-# Run with Grad-CAM explainability images
+# Batch run with Grad-CAM explainability heatmaps
 py -3 src/tiger_ai_ultimate.py --data "path/to/your/images" --gradcam
 
-# Run on a single image
+# Single image analysis
 py -3 src/tiger_ai_ultimate.py --image tiger_photo.jpg
 
-# Generate interactive HTML dashboard (after a batch run)
+# Generate interactive HTML dashboard after a batch run
 py -3 reports/generate_html_dashboard.py
 
 # Generate Word run report
@@ -148,45 +164,63 @@ py -3 docs/generate_run_report_word.py
 ```
 
 ### First run notes
-- On first run, `yolov8n-oiv7.pt` (~6MB) will be downloaded automatically from Ultralytics.
-- `yolov8n.pt` and ResNet50 weights are also downloaded automatically on first use.
-- Internet connection required for first run. All subsequent runs use local cache.
+- `yolov8n-oiv7.pt` and `yolov8n.pt` are downloaded automatically on first run (~6 MB each).
+- ResNet50 ImageNet weights are downloaded automatically via PyTorch hub.
+- Internet connection required for first run only. All subsequent runs use local cache.
 
 ---
 
 ## Repository Structure
 
 ```
-epaib-batch05-group4/
+AI-Projects / EPAIB-Group-4 branch
 |
 +-- src/
-|   +-- tiger_ai_ultimate.py      [MAIN PIPELINE — v3.0 fused]
+|   +-- tiger_ai_ultimate.py      ← SINGLE END-TO-END FILE
+|                                    Section 0 : Training (YOLOv8 + ResNet50 + EfficientNetB3)
+|                                    Section 1 : Setup & Configuration
+|                                    Section 2 : Image Triage
+|                                    Section 3 : Preprocessing (CLAHE + Dehazing + IR)
+|                                    Section 4 : Model Loading
+|                                    Section 5 : Tiger Identity Database
+|                                    Section 6 : Species Verification Layer
+|                                    Section 7 : ViewPoint Classification
+|                                    Section 8 : Colour Morph Classification
+|                                    Section 8b: Water Reflection Guard
+|                                    Section 9 : Grad-CAM Explainability
+|                                    Section 10: Artefact Guards (shadow, corner, overlap)
+|                                    Section 11: Cascade Detection
+|                                    Section 12: Single Image Analysis
+|                                    Section 13: Batch Processing + Population Report
+|
++-- data/
+|   +-- sample/tigers/
+|       +-- train/                 Training images (committed for testing)
+|       +-- test/                  Test images
+|       +-- val/                   Validation images
 |
 +-- reports/
-|   +-- generate_html_dashboard.py   Interactive HTML dashboard generator
-|   +-- Tiger_AI_Dashboard.html      [OUTPUT — open in browser]
+|   +-- generate_html_dashboard.py    Interactive HTML dashboard generator
+|   +-- Tiger_AI_Dashboard.html       [OUTPUT — open in browser]
 |   +-- Tiger_AI_Ultimate_Run_Report.docx  [OUTPUT — Word report]
 |   +-- ultimate_population_report.csv     [OUTPUT — per-detection log]
-|   +-- ultimate_tiger_db.json             [OUTPUT — tiger identity database]
-|   +-- Panel_Code_Review_Feedback.xlsx    [OUTPUT — panel review]
+|   +-- ultimate_tiger_db.json             [OUTPUT — tiger identity DB]
 |   +-- ultimate_annotated/               [OUTPUT — annotated images]
 |   +-- ultimate_gradcam/                 [OUTPUT — Grad-CAM heatmaps]
 |
 +-- docs/
-|   +-- architecture.md               Pipeline design + design rules
-|   +-- amur_tiger_run_observations.md Detailed run observations (ATRW)
+|   +-- architecture.md               Pipeline design + design decisions
+|   +-- amur_tiger_run_observations.md Detailed run observations (ATRW dataset)
+|   +-- algorithm_stepbystep.md        Step-by-step explanation (non-technical)
 |   +-- capstone_checklist.md          Submission checklist for IIM faculty
-|   +-- dataset_description.md         Dataset sources and citations
-|   +-- generate_run_report_word.py    Word report generator
-|   +-- generate_panel_feedback_excel.py  Excel feedback sheet generator
-|   +-- build_ppt.py                   PowerPoint deck builder
 |
-+-- notebooks/                        Google Colab notebooks
-+-- data/
-|   +-- sample/tigers/train/          Sample images (committed for testing)
++-- presentation/
+|   +-- TRACE_Presentation.pptx        Final presentation deck
+|   +-- Tiger_Enumeration_Group4.pptx  Group 4 submission deck
 |
-+-- requirements.txt                  All Python dependencies
-+-- README.md                         This file
++-- notebooks/                         Exploration notebooks (Colab)
++-- requirements.txt                   All Python dependencies
++-- README.md                          This file
 ```
 
 ---
