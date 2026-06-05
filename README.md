@@ -176,22 +176,32 @@ py -3 docs/generate_run_report_word.py
 AI-Projects / EPAIB-Group-4 branch
 |
 +-- src/
-|   +-- tiger_ai_ultimate.py      ← SINGLE END-TO-END FILE
-|                                    Section 0 : Training (YOLOv8 + ResNet50 + EfficientNetB3)
-|                                    Section 1 : Setup & Configuration
-|                                    Section 2 : Image Triage
-|                                    Section 3 : Preprocessing (CLAHE + Dehazing + IR)
-|                                    Section 4 : Model Loading
-|                                    Section 5 : Tiger Identity Database
-|                                    Section 6 : Species Verification Layer
-|                                    Section 7 : ViewPoint Classification
-|                                    Section 8 : Colour Morph Classification
-|                                    Section 8b: Water Reflection Guard
-|                                    Section 9 : Grad-CAM Explainability
-|                                    Section 10: Artefact Guards (shadow, corner, overlap)
-|                                    Section 11: Cascade Detection
-|                                    Section 12: Single Image Analysis
-|                                    Section 13: Batch Processing + Population Report
+|   +-- tiger_ai_ultimate.py      ← SINGLE END-TO-END FILE (~3000 lines)
+|   |                                Section 0 : Training
+|   |                                             - YOLOv8 custom fine-tune (--stage yolo)
+|   |                                             - ResNet50 detection (--stage detection)
+|   |                                             - EfficientNetB3 individual ID (--stage identification)
+|   |                                Section 1 : Setup & Configuration
+|   |                                Section 2 : Image Triage
+|   |                                Section 3 : Preprocessing (CLAHE + Dehazing + IR normalisation)
+|   |                                Section 4 : Model Loading (YOLOv8 OIV7 + COCO + ResNet50)
+|   |                                Section 5 : Tiger Identity Database (JSON persistence)
+|   |                                Section 6 : Species Verification Layer (ResNet50 top-3 gate)
+|   |                                Section 7 : ViewPoint Classification (Left/Right/Frontal)
+|   |                                Section 8 : Colour Morph Classification
+|   |                                Section 8b: Water Reflection Guard
+|   |                                Section 9 : Grad-CAM Explainability
+|   |                                Section 10: Artefact Guards (shadow, corner trace, overlap)
+|   |                                Section 11: Cascade Detection (OIV7 → COCO → whole-image)
+|   |                                Section 12: Single Image Analysis
+|   |                                Section 13: Batch Processing + ViewPoint-Aware Population Report
+|   |
+|   +-- devils_advocate.py        ← Validation tool — runs pipeline twice on same images
+|   |                                and compares results to verify consistency
+|   |
+|   +-- yeshvir/                  ← Team member contributions (PyTorch scripts)
+|       +-- yeshvir_colab_pytorch.py
+|       +-- yeshvir_multi_animal_pytorch.py
 |
 +-- data/
 |   +-- sample/tigers/
