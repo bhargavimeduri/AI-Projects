@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Prof-SW Review — Dr. Sowmya Subramaniam</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 820px; margin: 40px auto; padding: 0 24px; color: #212121; background: #fafafa; }
+  .header { padding: 28px 28px 20px; border-radius: 8px 8px 0 0; }
+  .header h1 { margin: 0; font-size: 24px; }
+  .header p  { margin: 6px 0 0; font-size: 13px; opacity: 0.85; }
+  .body { background: white; border: 1px solid #e0e0e0; border-radius: 0 0 8px 8px; padding: 28px; }
+  h2 { font-size: 17px; border-bottom: 2px solid; padding-bottom: 6px; margin-top: 28px; }
+  h3 { font-size: 15px; margin-top: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { padding: 9px 13px; text-align: left; color: white; }
+  td { padding: 9px 13px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #f9f9f9; }
+  .verdict { padding: 14px 18px; border-radius: 6px; font-size: 14px; font-weight: bold; margin: 14px 0; }
+  .green  { background: #E8F5E9; color: #2E7D32; border-left: 5px solid #2E7D32; }
+  .amber  { background: #FFF8E1; color: #F57F17; border-left: 5px solid #F57F17; }
+  .red    { background: #FFEBEE; color: #C62828; border-left: 5px solid #C62828; }
+  .blue   { background: #E3F2FD; color: #0D47A1; border-left: 5px solid #0D47A1; }
+  .gap    { background: #FFF3E0; border-left: 4px solid #E65100; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .strong { background: #E8F5E9; border-left: 4px solid #2E7D32; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .action { background: #0D2B55; color: white; padding: 16px 20px; border-radius: 6px; margin-top: 24px; font-size: 13px; }
+  .action h3 { color: #90CAF9; margin-top: 0; }
+  .footer { margin-top: 32px; font-size: 11px; color: #999; text-align: center; }
+  ul { font-size: 13px; line-height: 2.0; }
+  p  { font-size: 13px; line-height: 1.7; }
+  code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="header" style="background:#1A237E; color:white;">
+  <h1>Prof-SW Review — Dr. Sowmya Subramaniam</h1>
+  <p>Faculty Supervisor | Associate Professor | IIM Lucknow</p>
+</div>
+<div class="body">
+
+<div class="verdict green">Overall Verdict: Good problem-solution alignment. Methodology needs academic rigour before final submission.</div>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Professor Profile</h2>
+<p><strong>Dr. Sowmya Subramaniam</strong> — Associate Professor, IIM Lucknow.<br>
+Faculty Supervisor for TRACE Capstone Project, EPAIB Batch 05, Group 4.<br>
+<em>Reviewing project approach, methodology, and academic rigour.</em></p>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Problem Statement Alignment</h2>
+<table>
+  <tr><th style="background:#0D2B55;">Requirement</th><th style="background:#0D2B55;">Status</th><th style="background:#0D2B55;">Evidence</th></tr>
+  <tr><td>Count tigers per image</td><td>Addressed</td><td>YOLOv8 counts bounding boxes per frame — Tigers_In_Frame column in CSV</td></tr>
+  <tr><td>Identify individual tigers</td><td>Addressed</td><td>ResNet50 + cosine similarity — 51 unique IDs in registry database</td></tr>
+  <tr><td>Classify tiger types</td><td>Partially addressed</td><td>Color morph: rule-based HSV. Subspecies: placeholder only. Must be labelled clearly.</td></tr>
+  <tr><td>No manual intervention</td><td>Addressed</td><td>Pipeline runs end-to-end. Forest officials upload → results generated automatically.</td></tr>
+  <tr><td>Handle camera trap conditions</td><td>Addressed</td><td>Phase 1 triage + CLAHE + dehazing + filters handle fog, night, partial bodies.</td></tr>
+  <tr><td>Scalable to 1TB</td><td>Not demonstrated</td><td>Tested on 187 images only. No benchmarking at scale.</td></tr>
+</table>
+
+<h2 style="border-color:#E65100; color:#E65100;">Methodology Concerns</h2>
+
+<div class="gap"><strong>No Ground Truth Labels</strong><br>
+The output "51 unique tigers" is a pipeline output — not a validated result.
+Without manually verified labels on at least a subset of images, you cannot compute accuracy, precision, or recall.
+This must be stated clearly in the presentation and in the project report.</div>
+
+<div class="gap"><strong>Subspecies Classifier Presented as Complete</strong><br>
+The Laplacian variance-based subspecies classification is a rule-based heuristic, not a trained model.
+In the PPT and report, this must be clearly labelled as "Phase 3 placeholder — ML classifier planned."
+Presenting it as a working classifier without this disclaimer is academically incorrect.</div>
+
+<div class="gap"><strong>No Train/Val/Test Split Documentation</strong><br>
+How was the 187-image dataset split? What was the rationale?
+For a course capstone, the methodology must be documented — even if the dataset is small.</div>
+
+<div class="gap"><strong>Tiger_003: 149 Sightings Unexplained</strong><br>
+One tiger appearing in 149 images out of 187 is an outlier that requires explanation.
+Either the dataset is skewed, or the threshold is collapsing identities. This needs investigation.</div>
+
+<h2 style="border-color:#2E7D32; color:#2E7D32;">What the Committee Will Appreciate</h2>
+<div class="strong">Real-world partnership with Wildlife Department, Government of West Bengal — strong industry connect.</div>
+<div class="strong">Honest limitations slide in the PPT — academic integrity is demonstrated.</div>
+<div class="strong">3-model architecture with clear justification for each model — good problem decomposition.</div>
+<div class="strong">Preprocessing chain specifically designed for Sundarbans conditions — domain awareness shown.</div>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Questions I Will Ask in the Review Session</h2>
+<ul>
+  <li>What is your evaluation plan? How will you measure success when real forest department data arrives?</li>
+  <li>Why is your database showing 51 tigers but only 33 valid detections in this run?</li>
+  <li>How confident are you in the subspecies classification? What is its accuracy?</li>
+  <li>Walk me through one row of your CSV — explain every column.</li>
+</ul>
+
+<div class="action">
+  <h3>Prof-SW's Action Items for Bhargavi</h3>
+  <ul>
+    <li>Manually label 30 images and compute precision/recall — even a small ground truth set is acceptable</li>
+    <li>Add an evaluation plan section to the PPT: "How we will validate accuracy with real data"</li>
+    <li>Clearly label subspecies as "rule-based placeholder" in PPT slide and notebook</li>
+    <li>Prepare an answer for: "51 tigers in DB vs 33 detections this run — explain the difference"</li>
+  </ul>
+</div>
+
+</div>
+<div class="footer">
+  TRACE — Tiger Recognition And Census Engine &nbsp;|&nbsp;
+  EPAIB Batch 05, Group 4, IIM Lucknow &nbsp;|&nbsp;
+  Code Review Session — 30 May 2026
+</div>
+</body></html>

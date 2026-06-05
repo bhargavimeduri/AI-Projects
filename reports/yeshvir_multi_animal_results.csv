@@ -1,0 +1,183 @@
+Unique_Tiger_ID,Original_Filename,Instance_Index,BBox_Coordinates,Status,Match_Confidence_Score,Top3_ResNet_Labels,Blur_Score,Std_Dev,Was_Fallback,Resolution_Width,Resolution_Height
+TIG_2026_0001,tiger_10.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,170.8,0.249,True,512,512
+TIG_2026_0002,tiger_103.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,53.9,0.234,True,512,512
+TIG_2026_0003,tiger_104.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,552.7,0.204,True,512,512
+TIG_2026_0004,tiger_107.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,146.4,0.199,True,512,512
+TIG_2026_0005,tiger_109.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,364.0,0.176,True,512,512
+TIG_2026_0006,tiger_110.png,1,"[0,1,510,509]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,311.4,0.325,False,512,512
+TIG_2026_0007,TIger_1122.jpeg,1,"[51,0,308,160]",Original,N/A (New Enrollment),tabby | egyptian cat | tiger cat,3837.9,0.291,False,308,163
+TIG_2026_0008,TIger_1123.jpeg,1,"[21,8,217,224]",Original,N/A (New Enrollment),tiger cat | tiger | egyptian cat,2412.5,0.191,False,225,225
+TIG_2026_0009,TIger_1124.jpeg,1,"[1,0,191,244]",Original,N/A (New Enrollment),tabby | egyptian cat | tiger cat,1284.8,0.2,False,201,251
+TIG_2026_0010,TIger_1125.jpeg,1,"[55,45,248,157]",Original,N/A (New Enrollment),egyptian cat | tabby | tiger cat,2495.4,0.259,False,308,163
+TIG_2026_0010,TIger_1125.jpeg,2,"[50,38,249,158]",Duplicate,93.3%,egyptian cat | tabby | tiger cat,2370.8,0.26,False,308,163
+TIG_2026_0011,TIger_1126.jpeg,1,"[15,0,298,167]",Original,N/A (New Enrollment),tabby | egyptian cat | tiger cat,4129.2,0.202,False,299,169
+TIG_2026_0012,tiger_115.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,144.1,0.213,True,512,512
+TIG_2026_0013,tiger_117.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | flatworm,424.4,0.161,True,512,512
+TIG_2026_0012,tiger_118.png,1,"[0,0,512,512]",Duplicate,91.2%,tiger | tiger cat | jaguar,414.2,0.195,True,512,512
+TIG_2026_0014,tiger_119.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | leopard,284.4,0.131,True,512,512
+TIG_2026_0012,tiger_12.png,1,"[8,44,438,509]",Duplicate,90.3%,tiger | tiger cat | patas,153.8,0.228,False,512,512
+TIG_2026_0015,tiger_121.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | tabby,1094.3,0.227,True,512,512
+TIG_2026_0016,tiger_125.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | barn spider,440.4,0.201,True,512,512
+TIG_2026_0005,tiger_126.png,1,"[60,177,378,435]",Duplicate,89.5%,tiger | tiger cat | patas,389.1,0.184,False,512,512
+TIG_2026_0017,tiger_127.png,1,"[174,100,421,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,339.1,0.247,False,512,512
+TIG_2026_0017,tiger_13.png,1,"[211,52,453,369]",Duplicate,90.9%,tiger | tiger cat | jaguar,1204.2,0.254,False,512,512
+TIG_2026_0018,tiger_130.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,168.6,0.185,True,512,512
+TIG_2026_0019,tiger_132.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,975.9,0.144,True,512,512
+TIG_2026_0012,tiger_136.png,1,"[0,0,512,512]",Duplicate,88.4%,tiger | tiger cat | zebra,159.8,0.206,True,512,512
+TIG_2026_0020,tiger_139.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,178.9,0.158,True,512,512
+TIG_2026_0021,tiger_14.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,116.8,0.162,True,512,512
+TIG_2026_0022,tiger_142.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,227.6,0.241,True,512,512
+TIG_2026_0012,tiger_143.png,1,"[0,0,512,512]",Duplicate,90.1%,tiger | tiger cat | jaguar,356.5,0.198,True,512,512
+TIG_2026_0005,tiger_149.png,1,"[0,0,512,512]",Duplicate,91.3%,tiger | tiger cat | patas,472.7,0.174,True,512,512
+TIG_2026_0023,tiger_15.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,68.2,0.181,True,512,512
+TIG_2026_0002,tiger_150.png,1,"[0,0,512,512]",Duplicate,90.6%,tiger | tiger cat | jaguar,80.3,0.205,True,512,512
+TIG_2026_0024,tiger_153.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,111.8,0.164,True,512,512
+TIG_2026_0012,tiger_154.png,1,"[0,0,512,512]",Duplicate,92.5%,tiger | tiger cat | barn spider,155.1,0.136,True,512,512
+TIG_2026_0025,tiger_155.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,939.3,0.127,True,512,512
+TIG_2026_0026,tiger_156.png,1,"[2,0,512,489]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,2500.9,0.229,False,512,512
+TIG_2026_0012,tiger_159.png,1,"[0,0,512,512]",Duplicate,89.6%,tiger | tiger cat | jaguar,627.5,0.261,True,512,512
+TIG_2026_0027,tiger_162.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,273.0,0.171,True,512,512
+TIG_2026_0012,tiger_163.png,1,"[0,0,512,512]",Duplicate,88.7%,tiger | tiger cat | jaguar,147.0,0.169,True,512,512
+TIG_2026_0020,tiger_167.png,1,"[0,0,512,512]",Duplicate,88.7%,tiger | tiger cat | jaguar,672.5,0.157,True,512,512
+TIG_2026_0012,tiger_170.png,1,"[0,0,512,512]",Duplicate,88.4%,tiger | tiger cat | jaguar,145.0,0.232,True,512,512
+TIG_2026_0028,tiger_172.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,548.7,0.227,True,512,512
+TIG_2026_0029,tiger_175.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),prairie chicken | black grouse | tiger,54.6,0.091,True,512,512
+TIG_2026_0030,tiger_178.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,80.3,0.175,True,512,512
+TIG_2026_0031,tiger_179.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,411.8,0.227,True,512,512
+TIG_2026_0012,tiger_181.png,1,"[104,92,465,435]",Duplicate,91.9%,tiger | tiger cat | jaguar,626.4,0.186,False,512,512
+TIG_2026_0012,tiger_185.png,1,"[0,0,512,512]",Duplicate,91.4%,tiger | tiger cat | patas,161.1,0.209,True,512,512
+TIG_2026_0032,tiger_188.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | leopard,96.2,0.11,True,512,512
+TIG_2026_0012,tiger_189.png,1,"[0,0,512,512]",Duplicate,89.3%,tiger | tiger cat | jaguar,211.2,0.189,True,512,512
+TIG_2026_0033,tiger_19.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | leopard,50.9,0.229,True,512,512
+TIG_2026_0034,tiger_190.png,1,"[63,45,407,474]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,159.4,0.206,False,512,512
+TIG_2026_0012,tiger_192.png,1,"[0,0,512,512]",Duplicate,88.5%,tiger | tiger cat | patas,497.8,0.137,True,512,512
+TIG_2026_0004,tiger_193.png,1,"[0,0,512,512]",Duplicate,90.9%,tiger | tiger cat | patas,284.5,0.163,True,512,512
+TIG_2026_0035,tiger_194.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,239.6,0.158,True,512,512
+TIG_2026_0036,tiger_195.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | barn spider,87.7,0.203,True,512,512
+TIG_2026_0033,tiger_198.png,1,"[2,26,502,511]",Duplicate,91.0%,tiger | tiger cat | jaguar,171.8,0.22,False,512,512
+TIG_2026_0012,tiger_200.png,1,"[89,9,511,506]",Duplicate,90.1%,tiger | tiger cat | zebra,300.0,0.202,False,512,512
+TIG_2026_0012,tiger_201.png,1,"[0,0,512,512]",Duplicate,90.4%,tiger | tiger cat | patas,1594.8,0.221,True,512,512
+TIG_2026_0037,tiger_205.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,406.6,0.21,True,512,512
+TIG_2026_0038,tiger_206.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,103.4,0.123,True,512,512
+TIG_2026_0012,tiger_208.png,1,"[0,0,512,512]",Duplicate,92.6%,tiger | tiger cat | patas,179.8,0.195,True,512,512
+TIG_2026_0003,tiger_21.png,1,"[0,0,512,512]",Duplicate,88.4%,tiger | tiger cat | zebra,7525.1,0.217,True,512,512
+TIG_2026_0039,tiger_210.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,490.3,0.165,True,512,512
+TIG_2026_0040,tiger_219.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,164.2,0.195,True,512,512
+TIG_2026_0041,tiger_223.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,120.1,0.141,True,512,512
+TIG_2026_0042,tiger_224.png,1,"[214,85,436,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,267.6,0.182,False,512,512
+TIG_2026_0012,tiger_225.png,1,"[0,0,512,512]",Duplicate,92.9%,tiger | tiger cat | patas,152.3,0.127,True,512,512
+TIG_2026_0012,tiger_228.png,1,"[0,0,512,512]",Duplicate,90.8%,tiger | tiger cat | jaguar,368.8,0.225,True,512,512
+TIG_2026_0043,tiger_23.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,57.4,0.232,True,512,512
+TIG_2026_0012,tiger_230.png,1,"[0,0,512,512]",Duplicate,90.7%,tiger | tiger cat | jaguar,220.5,0.179,True,512,512
+TIG_2026_0044,tiger_231.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,238.1,0.246,True,512,512
+TIG_2026_0045,tiger_234.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | fur coat,226.5,0.095,True,512,512
+TIG_2026_0046,tiger_235.png,1,"[160,49,396,472]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,679.1,0.214,False,512,512
+TIG_2026_0047,tiger_236.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | ocarina,67.8,0.209,True,512,512
+TIG_2026_0048,tiger_237.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,1153.7,0.179,True,512,512
+TIG_2026_0017,tiger_24.png,1,"[34,28,291,511]",Duplicate,88.7%,tiger | tiger cat | patas,312.1,0.185,False,512,512
+TIG_2026_0049,tiger_240.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,150.2,0.175,True,512,512
+TIG_2026_0050,tiger_241.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,471.5,0.197,True,512,512
+TIG_2026_0021,tiger_244.png,1,"[0,0,512,512]",Duplicate,91.0%,tiger | tiger cat | patas,690.3,0.2,True,512,512
+TIG_2026_0051,tiger_249.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,226.9,0.143,True,512,512
+TIG_2026_0052,tiger_250.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,272.6,0.206,True,512,512
+TIG_2026_0053,tiger_253.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | dhole,309.1,0.182,True,512,512
+TIG_2026_0054,tiger_254.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | pole,140.6,0.251,True,512,512
+TIG_2026_0055,tiger_255.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | dhole,274.8,0.128,True,512,512
+TIG_2026_0056,tiger_256.png,1,"[9,7,486,378]",Original,N/A (New Enrollment),tiger | tiger cat | lion,103.9,0.228,False,512,512
+TIG_2026_0021,tiger_260.png,1,"[0,0,512,512]",Duplicate,88.3%,tiger | tiger cat | zebra,299.3,0.171,True,512,512
+TIG_2026_0057,tiger_261.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,195.8,0.24,True,512,512
+TIG_2026_0058,tiger_266.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,1286.4,0.254,True,512,512
+TIG_2026_0059,tiger_269.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,111.0,0.167,True,512,512
+TIG_2026_0060,tiger_273.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,117.1,0.19,True,512,512
+TIG_2026_0061,tiger_275.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,292.7,0.178,True,512,512
+TIG_2026_0021,tiger_276.png,1,"[0,0,512,512]",Duplicate,89.9%,tiger | tiger cat | patas,458.7,0.189,True,512,512
+TIG_2026_0062,tiger_279.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,256.9,0.155,True,512,512
+TIG_2026_0012,tiger_280.png,1,"[0,0,512,512]",Duplicate,90.5%,tiger | tiger cat | jaguar,215.7,0.146,True,512,512
+TIG_2026_0063,tiger_281.png,1,"[161,83,319,509]",Original,N/A (New Enrollment),tiger | tiger cat | patas,415.0,0.184,False,512,512
+TIG_2026_0012,tiger_282.png,1,"[0,0,512,512]",Duplicate,91.1%,tiger | tiger cat | jaguar,218.1,0.16,True,512,512
+TIG_2026_0012,tiger_283.png,1,"[0,0,512,512]",Duplicate,91.3%,tiger | tiger cat | patas,153.3,0.144,True,512,512
+TIG_2026_0061,tiger_284.png,1,"[15,41,365,456]",Duplicate,88.7%,tiger | tiger cat | patas,189.9,0.279,False,512,512
+TIG_2026_0064,tiger_286.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,75.5,0.181,True,512,512
+TIG_2026_0065,tiger_289.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,111.7,0.157,True,512,512
+TIG_2026_0003,tiger_295.png,1,"[0,0,512,512]",Duplicate,90.4%,tiger | tiger cat | jaguar,2604.3,0.205,True,512,512
+TIG_2026_0061,tiger_299.png,1,"[0,0,512,512]",Duplicate,88.7%,tiger | tiger cat | patas,172.1,0.179,True,512,512
+TIG_2026_0066,tiger_300.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | cliff,243.5,0.206,True,512,512
+TIG_2026_0067,tiger_302.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,1263.1,0.205,True,512,512
+TIG_2026_0068,tiger_303.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,3779.2,0.17,True,512,512
+TIG_2026_0003,tiger_304.png,1,"[0,0,512,512]",Duplicate,93.7%,tiger | tiger cat | jaguar,729.0,0.252,True,512,512
+TIG_2026_0069,tiger_305.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | lynx | tiger cat,1520.5,0.172,True,512,512
+TIG_2026_0004,tiger_306.png,1,"[0,0,512,512]",Duplicate,88.9%,tiger | tiger cat | jaguar,343.4,0.245,True,512,512
+TIG_2026_0070,tiger_309.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,130.5,0.135,True,512,512
+TIG_2026_0071,tiger_315.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,207.8,0.149,True,512,512
+TIG_2026_0003,tiger_316.png,1,"[0,0,512,512]",Duplicate,91.4%,tiger | tiger cat | zebra,813.3,0.219,True,512,512
+TIG_2026_0072,tiger_319.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,90.4,0.312,True,512,512
+TIG_2026_0073,tiger_32.png,1,"[130,156,335,400]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,477.4,0.17,False,512,512
+TIG_2026_0074,tiger_321.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,1054.4,0.208,True,512,512
+TIG_2026_0075,tiger_323.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,1701.8,0.323,True,512,512
+TIG_2026_0076,tiger_326.png,1,"[0,68,355,479]",Original,N/A (New Enrollment),tiger | tiger cat | patas,378.2,0.259,False,512,512
+TIG_2026_0026,tiger_327.png,1,"[1,8,507,507]",Duplicate,88.1%,tiger | tiger cat | jaguar,3440.4,0.232,False,512,512
+TIG_2026_0077,tiger_331.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,318.3,0.209,True,512,512
+TIG_2026_0078,tiger_334.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,95.4,0.083,True,512,512
+TIG_2026_0079,tiger_336.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | snowmobile,288.7,0.198,True,512,512
+TIG_2026_0064,tiger_340.png,1,"[6,12,511,509]",Duplicate,88.9%,tiger | tiger cat | patas,245.4,0.224,False,512,512
+TIG_2026_0012,tiger_344.png,1,"[0,0,512,512]",Duplicate,89.2%,tiger | tiger cat | lynx,118.7,0.159,True,512,512
+TIG_2026_0080,tiger_345.png,1,"[137,108,508,399]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,199.5,0.218,False,512,512
+TIG_2026_0081,tiger_346.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | leopard,757.8,0.224,True,512,512
+TIG_2026_0082,tiger_347.png,1,"[158,231,295,510]",Original,N/A (New Enrollment),otterhound | tiger | sussex spaniel,359.4,0.166,False,512,512
+TIG_2026_0075,tiger_348.png,1,"[0,0,512,512]",Duplicate,90.9%,tiger | tiger cat | lynx,230.0,0.317,True,512,512
+TIG_2026_0061,tiger_349.png,1,"[0,0,512,512]",Duplicate,90.8%,tiger | tiger cat | patas,309.2,0.232,True,512,512
+TIG_2026_0083,tiger_350.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,1326.7,0.235,True,512,512
+TIG_2026_0003,tiger_351.png,1,"[0,0,512,512]",Duplicate,89.9%,tiger | tiger cat | jaguar,1102.1,0.212,True,512,512
+TIG_2026_0033,tiger_352.png,1,"[59,18,498,510]",Duplicate,92.5%,tiger | tiger cat | jaguar,137.7,0.269,False,512,512
+TIG_2026_0084,tiger_355.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,275.4,0.133,True,512,512
+TIG_2026_0085,tiger_358.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,233.9,0.183,True,512,512
+TIG_2026_0086,tiger_359.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,169.2,0.24,True,512,512
+TIG_2026_0087,tiger_360.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),leopard | tiger | jaguar,121.5,0.171,True,512,512
+TIG_2026_0088,tiger_361.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,177.4,0.134,True,512,512
+TIG_2026_0089,tiger_362.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | cardigan,151.8,0.228,True,512,512
+TIG_2026_0090,tiger_367.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,371.9,0.223,True,512,512
+TIG_2026_0091,tiger_368.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,1394.2,0.151,True,512,512
+TIG_2026_0092,tiger_369.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,245.5,0.362,True,512,512
+TIG_2026_0065,tiger_372.png,1,"[0,0,512,512]",Duplicate,91.0%,tiger | tiger cat | jaguar,58.6,0.157,True,512,512
+TIG_2026_0093,tiger_375.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | leopard,208.7,0.194,True,512,512
+TIG_2026_0012,tiger_382.png,1,"[80,28,459,391]",Duplicate,91.1%,tiger | tiger cat | patas,241.9,0.265,False,512,512
+TIG_2026_0094,tiger_387.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,167.2,0.122,True,512,512
+TIG_2026_0012,tiger_389.png,1,"[0,0,512,512]",Duplicate,90.9%,tiger | tiger cat | jaguar,272.4,0.28,True,512,512
+TIG_2026_0012,tiger_391.png,1,"[0,0,512,512]",Duplicate,90.4%,tiger | tiger cat | lynx,192.8,0.253,True,512,512
+TIG_2026_0095,tiger_395.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,262.6,0.258,True,512,512
+TIG_2026_0096,tiger_399.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,269.4,0.158,True,512,512
+TIG_2026_0097,tiger_401.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,238.6,0.18,True,512,512
+TIG_2026_0003,tiger_402.png,1,"[0,0,512,512]",Duplicate,93.0%,tiger | tiger cat | lynx,542.2,0.129,True,512,512
+TIG_2026_0098,tiger_403.png,1,"[211,117,303,433]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,2379.2,0.202,False,512,512
+TIG_2026_0099,tiger_408.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,291.4,0.24,True,512,512
+TIG_2026_0048,tiger_410.png,1,"[0,0,512,512]",Duplicate,91.3%,tiger | tiger cat | zebra,119.3,0.116,True,512,512
+TIG_2026_0100,tiger_411.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | snow leopard,134.1,0.327,True,512,512
+TIG_2026_0101,tiger_417.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,173.3,0.153,True,512,512
+TIG_2026_0102,tiger_42.png,1,"[84,86,306,422]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,297.7,0.25,False,512,512
+TIG_2026_0012,tiger_49.png,1,"[0,0,512,512]",Duplicate,90.8%,tiger | tiger cat | jaguar,270.4,0.206,True,512,512
+TIG_2026_0004,tiger_50.png,1,"[0,0,512,512]",Duplicate,91.6%,tiger | tiger cat | patas,254.9,0.216,True,512,512
+TIG_2026_0088,tiger_51.png,1,"[0,0,512,512]",Duplicate,92.3%,tiger | tiger cat | patas,209.1,0.146,True,512,512
+TIG_2026_0103,tiger_55.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | patas,1724.4,0.263,True,512,512
+TIG_2026_0104,tiger_6.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | zebra,248.2,0.212,True,512,512
+TIG_2026_0012,tiger_62.png,1,"[0,0,512,512]",Duplicate,90.6%,tiger | tiger cat | jaguar,149.5,0.193,True,512,512
+TIG_2026_0068,tiger_67.png,1,"[0,0,512,512]",Duplicate,88.1%,tiger | tiger cat | zebra,6491.9,0.18,True,512,512
+TIG_2026_0012,tiger_68.png,1,"[0,0,512,512]",Duplicate,90.0%,tiger | tiger cat | jaguar,168.6,0.195,True,512,512
+TIG_2026_0105,tiger_69.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | fountain,185.4,0.145,True,512,512
+TIG_2026_0064,tiger_7.png,1,"[0,0,512,512]",Duplicate,88.6%,tiger | tiger cat | lynx,317.8,0.21,True,512,512
+TIG_2026_0106,tiger_71.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | lion | tiger cat,152.2,0.124,True,512,512
+TIG_2026_0107,tiger_74.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,241.4,0.206,True,512,512
+TIG_2026_0012,tiger_75.png,1,"[0,0,512,512]",Duplicate,92.0%,tiger | tiger cat | jaguar,115.8,0.187,True,512,512
+TIG_2026_0108,tiger_76.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,394.9,0.159,True,512,512
+TIG_2026_0109,tiger_78.png,1,"[30,51,447,509]",Original,N/A (New Enrollment),tiger | tiger cat | alp,239.5,0.227,False,512,512
+TIG_2026_0003,tiger_79.png,1,"[0,0,512,512]",Duplicate,89.7%,tiger | tiger cat | jaguar,1354.8,0.169,True,512,512
+TIG_2026_0110,tiger_8.png,1,"[43,64,298,511]",Original,N/A (New Enrollment),tiger | tiger cat | jaguar,211.0,0.151,False,512,512
+TIG_2026_0035,tiger_84.png,1,"[0,134,470,505]",Duplicate,88.7%,tiger | tiger cat | dhole,168.4,0.182,False,512,512
+TIG_2026_0111,tiger_85.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | lynx,158.9,0.156,True,512,512
+TIG_2026_0112,tiger_86.png,1,"[66,2,384,501]",Original,N/A (New Enrollment),tiger | tiger cat | sorrel,657.4,0.253,False,512,512
+TIG_2026_0060,tiger_89.png,1,"[0,0,512,512]",Duplicate,92.9%,tiger | tiger cat | patas,201.5,0.19,True,512,512
+TIG_2026_0113,tiger_9.png,1,"[127,126,276,442]",Original,N/A (New Enrollment),tiger | lion | tiger cat,178.9,0.167,False,512,512
+TIG_2026_0033,tiger_90.png,1,"[0,0,512,512]",Duplicate,90.5%,tiger | tiger cat | patas,177.8,0.232,True,512,512
+TIG_2026_0114,tiger_91.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | tabby,251.6,0.309,True,512,512
+TIG_2026_0115,tiger_93.png,1,"[0,0,512,512]",Original,N/A (New Enrollment),tiger | tiger cat | tabby,227.3,0.164,True,512,512
+TIG_2026_0012,tiger_96.png,1,"[0,0,512,512]",Duplicate,90.0%,tiger | tiger cat | lynx,125.1,0.129,True,512,512
+TIG_2026_0065,tiger_98.png,1,"[0,0,512,512]",Duplicate,88.1%,tiger | tiger cat | jaguar,115.1,0.135,True,512,512

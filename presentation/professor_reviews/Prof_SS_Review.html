@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Prof-SS Review — Sumit Kumar Singh</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 820px; margin: 40px auto; padding: 0 24px; color: #212121; background: #fafafa; }
+  .header { padding: 28px 28px 20px; border-radius: 8px 8px 0 0; }
+  .header h1 { margin: 0; font-size: 24px; }
+  .header p  { margin: 6px 0 0; font-size: 13px; opacity: 0.85; }
+  .body { background: white; border: 1px solid #e0e0e0; border-radius: 0 0 8px 8px; padding: 28px; }
+  h2 { font-size: 17px; border-bottom: 2px solid; padding-bottom: 6px; margin-top: 28px; }
+  h3 { font-size: 15px; margin-top: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { padding: 9px 13px; text-align: left; color: white; }
+  td { padding: 9px 13px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #f9f9f9; }
+  .verdict { padding: 14px 18px; border-radius: 6px; font-size: 14px; font-weight: bold; margin: 14px 0; }
+  .green  { background: #E8F5E9; color: #2E7D32; border-left: 5px solid #2E7D32; }
+  .amber  { background: #FFF8E1; color: #F57F17; border-left: 5px solid #F57F17; }
+  .red    { background: #FFEBEE; color: #C62828; border-left: 5px solid #C62828; }
+  .blue   { background: #E3F2FD; color: #0D47A1; border-left: 5px solid #0D47A1; }
+  .gap    { background: #FFF3E0; border-left: 4px solid #E65100; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .strong { background: #E8F5E9; border-left: 4px solid #2E7D32; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .action { background: #0D2B55; color: white; padding: 16px 20px; border-radius: 6px; margin-top: 24px; font-size: 13px; }
+  .action h3 { color: #90CAF9; margin-top: 0; }
+  .footer { margin-top: 32px; font-size: 11px; color: #999; text-align: center; }
+  ul { font-size: 13px; line-height: 2.0; }
+  p  { font-size: 13px; line-height: 1.7; }
+  code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="header" style="background:#E65100; color:white;">
+  <h1>Prof-SS Review — Sumit Kumar Singh</h1>
+  <p>AceAI.Club | Garage Labs | Harvard | IIM Lucknow | ex-Microsoft | TEDx</p>
+</div>
+<div class="body">
+
+<div class="verdict green">Overall Verdict: Pipeline runs, results are clean, notebook is shareable. Three quick wins will make this demo-ready.</div>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Professor Profile</h2>
+<p><strong>Sumit Kumar Singh</strong> — Founder, AceAI.Club (50,000+ community) & Garage Labs Technologies.<br>
+Harvard Business School | IIM Lucknow MBA | IIT Delhi | ex-Microsoft | TEDx Speaker.<br>
+<em>Taught: Prompt Engineering, Google Colab Working Sessions — EPAIB Batch 05.</em></p>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Product Readiness Check</h2>
+<table>
+  <tr><th style="background:#0D2B55;">Question</th><th style="background:#0D2B55;">Status</th></tr>
+  <tr><td>Does the code run without errors?</td><td>Yes — ran successfully on 187 images</td></tr>
+  <tr><td>Does it solve the stated problem?</td><td>Yes — counts, identifies, classifies tigers</td></tr>
+  <tr><td>Can a non-technical person use it?</td><td>Not yet — needs Gradio UI</td></tr>
+  <tr><td>Is the Colab notebook shareable?</td><td>Yes — TRACE_Tiger_Pipeline.ipynb is ready</td></tr>
+  <tr><td>Is there a visual output (image with boxes)?</td><td>No — only CSV output currently</td></tr>
+  <tr><td>Can results be downloaded from Colab?</td><td>Yes — files.download() cell added</td></tr>
+</table>
+
+<h2 style="border-color:#E65100; color:#E65100;">Three Quick Wins Before the Demo</h2>
+
+<div class="gap"><strong>Win 1: Add Bounding Box Visualisation</strong><br>
+Right now the output is a CSV table. Add one cell to the notebook that draws bounding boxes on the image
+with the tiger ID and color morph printed on top. <em>Forest officials understand a picture — not a DataFrame.</em>
+This is your best demo moment. One image, three boxes: Tiger_003 | Orange_Standard | Bengal.
+That visual alone will make the faculty review session memorable.</div>
+
+<div class="gap"><strong>Win 2: Simplify the IMAGE_DIR instruction in Cell 3</strong><br>
+Currently the instruction is too technical for a beginner. Replace with a clear, guided comment:<br>
+<code># CHANGE ONLY THIS LINE — paste your Google Drive folder path below</code><br>
+Team members with zero coding experience should be able to run this in under 5 minutes.</div>
+
+<div class="gap"><strong>Win 3: Add Gradio Upload Interface</strong><br>
+Two lines of code transforms a notebook into a product:<br>
+<code>import gradio as gr</code><br>
+<code>gr.Interface(fn=run_pipeline, inputs="file", outputs="file").launch()</code><br>
+Forest officials upload a folder → pipeline runs → CSV downloads. No Python knowledge required.
+<em>"The prompt is the product. The notebook IS the interface — make it so simple anyone can run it."</em></div>
+
+<h2 style="border-color:#2E7D32; color:#2E7D32;">What Is Working Well</h2>
+<div class="strong">Notebook installs all dependencies in Cell 1 — no setup friction for team members.</div>
+<div class="strong">Google Drive mount in Cell 2 — team can use their own images immediately.</div>
+<div class="strong">Results CSV auto-downloaded at end — end-to-end flow complete.</div>
+<div class="strong">Phase-by-phase structure with markdown headers — beginner-friendly, self-explanatory.</div>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Demo Strategy for Sowmya Mam's Session</h2>
+<ul>
+  <li>Open the Colab notebook — <strong>Runtime → Run All</strong> — show it running live</li>
+  <li>Show the bounding box visualisation cell — one image with tiger boxes drawn on it</li>
+  <li>Open the CSV — show Tiger_003 with 149 sightings — explain the persistent database concept</li>
+  <li>Show the Phase 1 triage output — one unusable image that was <em>rejected before ML ran</em></li>
+</ul>
+
+<div class="action">
+  <h3>Prof-SS's Action Items for Bhargavi</h3>
+  <ul>
+    <li>Add bounding box visualisation cell to the Colab notebook — draw boxes on image, print tiger ID</li>
+    <li>Simplify Cell 3 IMAGE_DIR instruction for zero-experience team members</li>
+    <li>Add Gradio interface as the final cell — 5 lines of code, complete product demo</li>
+    <li>Rehearse the demo: Run All → show visualisation → show CSV → explain one row</li>
+  </ul>
+</div>
+
+</div>
+<div class="footer">
+  TRACE — Tiger Recognition And Census Engine &nbsp;|&nbsp;
+  EPAIB Batch 05, Group 4, IIM Lucknow &nbsp;|&nbsp;
+  Code Review Session — 30 May 2026
+</div>
+</body></html>

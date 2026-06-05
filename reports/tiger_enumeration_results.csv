@@ -1,0 +1,191 @@
+Image_File,Range,Beat,Image_Quality,Tigers_In_Frame,Identified_ID,Color_Morph,Subspecies,Status,Match_Score,Detection_Confidence
+tiger_10.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.824
+tiger_103.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_104.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4325
+tiger_107.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5616
+tiger_109.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.5381
+tiger_110.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.8796,0.7715
+TIger_1122.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_004,Orange_Standard,Sumatran (high stripe density),Recaptured Match,1.0,0.9354
+TIger_1123.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_005,Orange_Standard,Sumatran (high stripe density),Recaptured Match,1.0,0.8134
+TIger_1124.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,3,Tiger_006,Golden,Sumatran (high stripe density),Recaptured Match,1.0,0.6374
+TIger_1124.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,3,FILTERED,,,"Filtered — wrong class (COCO class 0, not a tiger proxy)",,0.46
+TIger_1124.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,3,FILTERED,,,Filtered — low confidence (0.26 < 0.35),,0.2612
+TIger_1125.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,2,Tiger_008,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9744,0.5011
+TIger_1125.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,2,Tiger_008,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9703,0.4429
+TIger_1126.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_009,Orange_Standard,Sumatran (high stripe density),Recaptured Match,1.0,0.742
+tiger_115.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7961
+tiger_117.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8187
+tiger_118.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2574
+tiger_119.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.8707
+tiger_12.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9495,0.4132
+tiger_121.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 20, not a tiger proxy)",,0.2694
+tiger_125.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4138
+tiger_126.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9206,0.6197
+tiger_127.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9013,0.7569
+tiger_13.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.962,0.7225
+tiger_130.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.832
+tiger_132.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.6774
+tiger_136.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5771
+tiger_139.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.8799
+tiger_14.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3759
+tiger_142.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7437
+tiger_143.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4583
+tiger_149.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6707
+tiger_15.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_150.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7156
+tiger_153.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6372
+tiger_154.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7713
+tiger_155.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8353
+tiger_156.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_017,Golden,Sumatran (high stripe density),Recaptured Match,0.9473,0.7255
+tiger_159.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5804
+tiger_162.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.2993
+tiger_163.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7587
+tiger_167.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6129
+tiger_170.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4131
+tiger_172.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3267
+tiger_173.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_175.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_178.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 23, not a tiger proxy)",,0.747
+tiger_179.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4242
+tiger_181.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9557,0.6675
+tiger_185.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3584
+tiger_188.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8444
+tiger_189.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2618
+tiger_19.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_190.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,Filtered — low confidence (0.32 < 0.35),,0.3216
+tiger_192.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7019
+tiger_193.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5921
+tiger_194.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2905
+tiger_195.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.7295
+tiger_198.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9261,0.5746
+tiger_200.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9033,0.5379
+tiger_201.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7
+tiger_205.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4228
+tiger_206.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7032
+tiger_208.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.811
+tiger_21.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8826
+tiger_210.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2822
+tiger_219.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 0, not a tiger proxy)",,0.3842
+tiger_223.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.2896
+tiger_224.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.8959,0.6333
+tiger_225.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.753
+tiger_228.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4712
+tiger_23.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_230.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.2939
+tiger_231.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6171
+tiger_233.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_234.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 23, not a tiger proxy)",,0.281
+tiger_235.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9085,0.3849
+tiger_236.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_237.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.3274
+tiger_24.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Golden,Sumatran (high stripe density),Recaptured Match,0.93,0.6183
+tiger_240.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3493
+tiger_241.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 21, not a tiger proxy)",,0.8699
+tiger_244.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6967
+tiger_249.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2546
+tiger_250.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3738
+tiger_253.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.3392
+tiger_254.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 23, not a tiger proxy)",,0.6457
+tiger_255.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7973
+tiger_256.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Siberian (low stripe density),Recaptured Match,0.8652,0.5454
+tiger_260.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6639
+tiger_261.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4881
+tiger_266.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 18, not a tiger proxy)",,0.4615
+tiger_269.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,Filtered — low confidence (0.26 < 0.35),,0.2588
+tiger_273.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8812
+tiger_275.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.675
+tiger_276.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5538
+tiger_279.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 21, not a tiger proxy)",,0.3623
+tiger_280.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.3856
+tiger_281.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,Filtered — low confidence (0.34 < 0.35),,0.3419
+tiger_282.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4461
+tiger_283.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.532
+tiger_284.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9289,0.4741
+tiger_286.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_289.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2753
+tiger_295.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7547
+tiger_299.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3352
+tiger_300.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4603
+tiger_302.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.255
+tiger_303.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7993
+tiger_304.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7336
+tiger_305.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.7063
+tiger_306.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.4623
+tiger_309.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.8144
+tiger_315.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.5103
+tiger_316.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7218
+tiger_319.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,Filtered — low confidence (0.29 < 0.35),,0.2859
+tiger_32.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_030,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9871,0.5974
+tiger_321.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7356
+tiger_323.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7731
+tiger_326.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_032,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,1.0,0.4893
+tiger_327.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_017,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.9659,0.8817
+tiger_331.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6958
+tiger_334.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8593
+tiger_336.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5589
+tiger_340.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Golden,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9211,0.3527
+tiger_344.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.391
+tiger_345.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,Filtered — low confidence (0.31 < 0.35),,0.3089
+tiger_346.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 23, not a tiger proxy)",,0.4905
+tiger_347.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_035,Orange_Standard,Sumatran (high stripe density),Recaptured Match,1.0,0.404
+tiger_348.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6729
+tiger_349.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8362
+tiger_350.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.583
+tiger_351.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.877
+tiger_352.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9302,0.8597
+tiger_355.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.458
+tiger_358.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7982
+tiger_359.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 18, not a tiger proxy)",,0.4482
+tiger_360.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5478
+tiger_361.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7526
+tiger_362.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7628
+tiger_367.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3361
+tiger_368.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6753
+tiger_369.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4671
+tiger_371.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_372.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_375.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.5531
+tiger_382.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9545,0.7397
+tiger_387.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.7963
+tiger_389.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8245
+tiger_391.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4301
+tiger_395.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.5367
+tiger_399.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.639
+tiger_4.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_401.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.7987
+tiger_402.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7489
+tiger_403.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_044,Orange_Standard,Sumatran (high stripe density),Recaptured Match,1.0,0.9071
+tiger_408.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.6198
+tiger_410.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4182
+tiger_411.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5065
+tiger_417.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8567
+tiger_42.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Sumatran (high stripe density),Recaptured Match,0.8988,0.4848
+tiger_49.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4774
+tiger_50.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.9072
+tiger_51.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6224
+tiger_52.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_54.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_55.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7391
+tiger_6.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.5806
+tiger_62.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.5694
+tiger_67.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7899
+tiger_68.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2879
+tiger_69.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 23, not a tiger proxy)",,0.4887
+tiger_7.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.7237
+tiger_71.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 19, not a tiger proxy)",,0.6455
+tiger_74.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6527
+tiger_75.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.3357
+tiger_76.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2718
+tiger_78.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_048,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,1.0,0.5828
+tiger_79.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.8202
+tiger_8.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_003,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,0.9026,0.5761
+tiger_84.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_049,Orange_Standard,Bengal (medium stripe density — most likely in India),Recaptured Match,1.0,0.4077
+tiger_85.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.3148
+tiger_86.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,Tiger_050,Orange_Standard,Sumatran (high stripe density),Recaptured Match,1.0,0.5682
+tiger_89.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4561
+tiger_9.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Unusable_Blurry,0,UNUSABLE,,,Rejected — Motion blur — Laplacian variance < 80.0,,
+tiger_90.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.809
+tiger_91.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.859
+tiger_93.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.6589
+tiger_96.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 14, not a tiger proxy)",,0.2531
+tiger_98.png,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,1,FILTERED,,,"Filtered — wrong class (COCO class 22, not a tiger proxy)",,0.4768

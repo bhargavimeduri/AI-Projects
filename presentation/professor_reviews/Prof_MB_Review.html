@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Prof-MB Review — Mahesh Balan PhD</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 820px; margin: 40px auto; padding: 0 24px; color: #212121; background: #fafafa; }
+  .header { padding: 28px 28px 20px; border-radius: 8px 8px 0 0; }
+  .header h1 { margin: 0; font-size: 24px; }
+  .header p  { margin: 6px 0 0; font-size: 13px; opacity: 0.85; }
+  .body { background: white; border: 1px solid #e0e0e0; border-radius: 0 0 8px 8px; padding: 28px; }
+  h2 { font-size: 17px; border-bottom: 2px solid; padding-bottom: 6px; margin-top: 28px; }
+  h3 { font-size: 15px; margin-top: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { padding: 9px 13px; text-align: left; color: white; }
+  td { padding: 9px 13px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #f9f9f9; }
+  .verdict { padding: 14px 18px; border-radius: 6px; font-size: 14px; font-weight: bold; margin: 14px 0; }
+  .green  { background: #E8F5E9; color: #2E7D32; border-left: 5px solid #2E7D32; }
+  .amber  { background: #FFF8E1; color: #F57F17; border-left: 5px solid #F57F17; }
+  .red    { background: #FFEBEE; color: #C62828; border-left: 5px solid #C62828; }
+  .blue   { background: #E3F2FD; color: #0D47A1; border-left: 5px solid #0D47A1; }
+  .gap    { background: #FFF3E0; border-left: 4px solid #E65100; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .strong { background: #E8F5E9; border-left: 4px solid #2E7D32; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .action { background: #0D2B55; color: white; padding: 16px 20px; border-radius: 6px; margin-top: 24px; font-size: 13px; }
+  .action h3 { color: #90CAF9; margin-top: 0; }
+  .footer { margin-top: 32px; font-size: 11px; color: #999; text-align: center; }
+  ul { font-size: 13px; line-height: 2.0; }
+  p  { font-size: 13px; line-height: 1.7; }
+  code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="header" style="background:#0D2B55; color:white;">
+  <h1>Prof-MB Review — Mahesh Balan PhD</h1>
+  <p>Neural Networks & Deep Learning | IIT Madras | Walmart | PayPal</p>
+</div>
+<div class="body">
+
+<div class="verdict amber">Overall Verdict: Technically sound foundation. Three critical gaps before final submission.</div>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Professor Profile</h2>
+<p><strong>Mahesh Balan Umaithanu, PhD</strong> — Principal Data Scientist, Walmart Global Tech India.<br>
+IIT Madras PhD | Ex-PayPal, Amazon, ZS Associates | Visiting Faculty: IIM Lucknow, IIT Madras, IIM Calcutta.<br>
+<em>Taught: Neural Networks, Deep Learning, Generative AI — EPAIB Batches 01–05.</em></p>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Architecture Review</h2>
+<table>
+  <tr><th style="background:#0D2B55;">Component</th><th style="background:#0D2B55;">Decision</th><th style="background:#0D2B55;">Prof-MB's Assessment</th></tr>
+  <tr><td>ResNet50 <code>[:-1]</code></td><td>Removes 1000-class head, keeps 2048-dim features</td><td>Correct. Feature extraction not classification. Right choice.</td></tr>
+  <tr><td>CenterCrop(224) not Resize(224,224)</td><td>Preserves aspect ratio</td><td>Correct. ImageNet standard. Prevents stripe distortion.</td></tr>
+  <tr><td>Cosine similarity over Euclidean</td><td>Scale-invariant identity matching</td><td>Correct. Day vs night images have different scales — cosine handles this.</td></tr>
+  <tr><td>Running average embedding</td><td>DB improves with each sighting</td><td>Correct. Elegant solution for open-set recognition.</td></tr>
+  <tr><td>YOLO proxy classes {15,16,17,24}</td><td>cat/dog/horse/zebra as tiger stand-ins</td><td>Acceptable interim only. Not production-grade. Fine-tune YOLO on tiger data.</td></tr>
+  <tr><td>Similarity threshold 0.83</td><td>Hardcoded</td><td><strong>Not derived from data. This is a guess. Must be calibrated via ROC curve.</strong></td></tr>
+</table>
+
+<h2 style="border-color:#E65100; color:#E65100;">Critical Gaps — Non-Negotiable Before Submission</h2>
+
+<div class="gap"><strong>Gap 1: Grad-CAM Missing</strong><br>
+Your ResNet50 extracts 2048-dim embeddings from tiger crops. But is it looking at stripes or at background trees?
+You do not know. Grad-CAM generates a heatmap showing which pixels in the image most influenced the embedding.
+Without Grad-CAM, you cannot claim the model learned stripe patterns. <em>"A model you can't explain is a model you can't trust."</em></div>
+
+<div class="gap"><strong>Gap 2: FNR Not Measured</strong><br>
+A missed tiger is a false negative. For wildlife conservation, the False Negative Rate is your real exposure.
+You have 51 tigers identified from 187 images. How many tigers did you miss? Currently unknown.
+This is your most significant unresolved risk. FNR target must be &lt; 5% per project specification.</div>
+
+<div class="gap"><strong>Gap 3: Threshold Not Calibrated</strong><br>
+0.83 is not science — it is a starting point. Every fraud model built at PayPal went through threshold calibration:
+plot FPR vs FNR across all thresholds, find the operating point that minimises conservation risk.
+This requires ground truth labels on at least 30 images.</div>
+
+<h2 style="border-color:#E65100; color:#E65100;">Output Analysis — Tiger_003 Red Flag</h2>
+<div class="gap"><strong>Tiger_003 has 149 sightings across 187 images — this is suspicious.</strong><br>
+Either: (a) the 0.83 threshold is too loose and many different tigers are collapsing into Tiger_003,
+or (b) one tiger genuinely dominates the dataset. You cannot distinguish these cases without ground truth.
+Investigate before presenting this number to Dr. Sowmya.</div>
+
+<h2 style="border-color:#2E7D32; color:#2E7D32;">What Is Working Well</h2>
+<div class="strong">Preprocessing chain (CLAHE + Dark Channel Prior dehazing) is correctly designed for Sundarbans conditions.</div>
+<div class="strong">3-model architecture is the right decomposition. One model for everything would have failed.</div>
+<div class="strong">Partial body handling (update_db=False) protects DB embedding quality. Good engineering discipline.</div>
+<div class="strong">Running on CPU noted — GPU required at production scale for 1TB processing.</div>
+
+<div class="action">
+  <h3>Prof-MB's Action Items for Bhargavi</h3>
+  <ul>
+    <li>Implement Grad-CAM on at least 5 tiger images — show what the model is attending to</li>
+    <li>Annotate 30 ground truth images to compute FNR and calibrate threshold via ROC curve</li>
+    <li>Investigate Tiger_003 — is 149 sightings real or a threshold collapse?</li>
+    <li>Be ready to answer: "Why ResNet50 over EfficientNet?" in the review session</li>
+  </ul>
+</div>
+
+</div>
+<div class="footer">
+  TRACE — Tiger Recognition And Census Engine &nbsp;|&nbsp;
+  EPAIB Batch 05, Group 4, IIM Lucknow &nbsp;|&nbsp;
+  Code Review Session — 30 May 2026
+</div>
+</body></html>

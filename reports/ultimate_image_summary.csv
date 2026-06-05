@@ -1,0 +1,14 @@
+Image_File,Image_Quality,Has_Tiger,Tiger_Count,Tiger_IDs,Color_Morphs
+004996.jpg,Clean,Yes,1,Unknown_Partial,Black Tiger
+005004.jpg,Clean,Yes,1,Tiger_001,Orange Tiger
+005010.jpg,Clean,Yes,1,Tiger_002,Orange Tiger
+005016.jpg,Clean,Yes,1,Tiger_001,Orange Tiger
+005021.jpg,Clean,Yes,1,Tiger_001,Orange Tiger
+007000.jpeg,Clean,No,0,—,—
+007001.jpeg,IR_Night,No,0,—,—
+007002.jpeg,Clean,No,0,—,—
+007003.jpeg,Clean,No,0,—,—
+007004.jpeg,Clean,Yes,1,Tiger_001,Orange Tiger
+007005.jpeg,Clean,Yes,4,"Tiger_001, Tiger_003",Orange Tiger
+007010.jpeg,Clean,Yes,1,Tiger_001,Golden Tiger
+008001.jpeg,Clean,Yes,2,"Tiger_001, Tiger_004",Orange Tiger

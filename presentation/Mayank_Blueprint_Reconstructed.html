@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mayank Tandon — AI Tiger Blueprint (Reconstructed)</title>
+<style>
+  body { font-family: Segoe UI, sans-serif; max-width: 960px; margin: 40px auto; padding: 0 24px; color: #212121; background: #fafafa; }
+  h1 { background: #0D2B55; color: white; padding: 20px 24px; border-radius: 8px; font-size: 22px; }
+  h2 { color: #1A4F8A; border-bottom: 2px solid #1A4F8A; padding-bottom: 6px; margin-top: 40px; }
+  h3 { color: #0D2B55; margin-top: 24px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 8px; }
+  .done   { background: #E8F5E9; color: #2E7D32; }
+  .gap    { background: #FFF3E0; color: #E65100; }
+  .missing{ background: #FFEBEE; color: #C62828; }
+  pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  th { background: #0D2B55; color: white; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #e0e0e0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .phase { background: white; border: 1px solid #BBDEFB; border-left: 5px solid #1A4F8A; padding: 16px 20px; border-radius: 6px; margin: 16px 0; }
+  .note { background: #E3F2FD; border-left: 4px solid #1A4F8A; padding: 12px 16px; border-radius: 4px; font-size: 14px; margin: 12px 0; }
+  .compare { background: #E8F5E9; border-left: 4px solid #2E7D32; padding: 12px 16px; border-radius: 4px; font-size: 14px; margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<h1>Mayank Tandon — AI Tiger Detection Blueprint (Reconstructed)<br>
+<small style="font-size:14px;font-weight:normal;">EPAIB Batch 05, Group 4 | IIM Lucknow | Source: Claude.ai shared chat</small></h1>
+
+<div class="note">
+  <strong>Context:</strong> Mayank Tandon (complete beginner, Google Colab, 200–500 Google images).
+  Claude played the role of Senior Data Scientist + ML Engineer + personal tutor.
+  The blueprint was reconstructed from the conversation content shared in the team session.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>1. Reality Check Table</h2>
+
+<table>
+  <tr><th>Reality</th><th>What It Means</th></tr>
+  <tr><td>200–500 images from Google</td><td>Very small dataset — use Transfer Learning to compensate</td></tr>
+  <tr><td>Zero coding experience</td><td>Use pre-built tools and copy-paste ready code in Google Colab</td></tr>
+  <tr><td>No official forest data yet</td><td>Build a working prototype now — swap in real data later</td></tr>
+  <tr><td>Complex problem (count + classify)</td><td>Split into 3 separate, simpler models — do NOT build one big model</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>2. The 3-Model Architecture</h2>
+
+<table>
+  <tr><th>Model</th><th>What It Does</th><th>Algorithm</th><th>Bhargavi's Pipeline</th></tr>
+  <tr><td><strong>Model 1</strong> — Image Triage</td><td>Is this image usable? Classify into 4 quality buckets</td><td>MobileNetV2 / ResNet18 (binary classifier)</td><td><span class="badge gap">70% done</span></td></tr>
+  <tr><td><strong>Model 2</strong> — Detection & Counting</td><td>Find tigers, draw boxes, count per frame</td><td>YOLOv8 (fine-tuned)</td><td><span class="badge done">100% done</span></td></tr>
+  <tr><td><strong>Model 3</strong> — Type Classifier</td><td>Orange / White / Golden / Black + Bengal / Sumatran etc.</td><td>ResNet50 + classification head</td><td><span class="badge missing">0% — not built</span></td></tr>
+</table>
+
+<h3>Model 1 — The 4 Quality Buckets</h3>
+<table>
+  <tr><th>Bucket</th><th>Description</th><th>Examples</th></tr>
+  <tr><td>False Positive</td><td>Triggered, but no wildlife present</td><td>Moving leaves, wind, shadows</td></tr>
+  <tr><td>Unusable Quality</td><td>Wildlife may be present, cannot be identified</td><td>Extreme blur, whiteout, blackout, heavy fog</td></tr>
+  <tr><td>Partial / Ambiguous</td><td>Wildlife present, requires expert deduction</td><td>Just a tail, blurry wing, close-up of fur</td></tr>
+  <tr><td>Clean Capture</td><td>High-quality image suitable for counting</td><td>Clear day/night shots with full body visible</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>3. Recommended Folder Structure</h2>
+
+<pre>
+tiger_detection_project/
+│
+├── data/
+│   ├── raw/                        # All original downloaded images (never touch these)
+│   ├── processed/                  # After preprocessing (CLAHE, dehazing applied)
+│   ├── train/
+│   │   ├── images/                 # 70% of data
+│   │   └── labels/                 # YOLO format .txt annotation files
+│   ├── val/
+│   │   ├── images/                 # 15% of data
+│   │   └── labels/
+│   └── test/
+│       ├── images/                 # 15% of data
+│       └── labels/
+│
+├── models/
+│   ├── model1_triage/
+│   │   ├── train_triage.ipynb
+│   │   └── triage_model.pt
+│   ├── model2_detection/
+│   │   ├── train_yolo.ipynb
+│   │   └── yolo_tiger.pt           # Fine-tuned YOLOv8 weights
+│   └── model3_classifier/
+│       ├── train_classifier.ipynb
+│       └── tiger_type_model.pt
+│
+├── notebooks/
+│   ├── 01_data_preparation.ipynb
+│   ├── 02_model1_triage.ipynb
+│   ├── 03_model2_detection.ipynb
+│   ├── 04_model3_classification.ipynb
+│   └── 05_pipeline_integration.ipynb
+│
+├── outputs/
+│   ├── predictions/                # Per-image results
+│   ├── reports/                    # CSV summary files
+│   └── visualizations/             # Grad-CAM, bbox overlays
+│
+├── src/
+│   └── tiger_pipeline.py           # Full integrated pipeline (Bhargavi's file)
+│
+└── README.md
+</pre>
+
+<div class="compare">
+  <strong>Bhargavi's current structure vs Mayank's blueprint:</strong> Your <code>src/tiger_pipeline.py</code>, <code>data/sample/tigers/</code>, and <code>reports/</code> folders already match this structure.
+  What's missing: <code>models/model1_triage/</code> and <code>models/model3_classifier/</code> folders.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>4. Phase-by-Phase Blueprint</h2>
+
+<div class="phase">
+  <h3>Phase 1 — Data Collection & Preparation</h3>
+  <ul>
+    <li>Download 200–500 tiger images from Google Images (different types, angles, lighting)</li>
+    <li>Organise into subfolders by tiger type: <code>orange/</code>, <code>white/</code>, <code>golden/</code>, <code>black/</code></li>
+    <li>Split: 70% train / 15% val / 15% test</li>
+    <li>Label using <strong>Roboflow</strong> (beginner-friendly web tool — draw boxes, export YOLO format)</li>
+    <li>Apply preprocessing: CLAHE for dark images, dehazing for fog</li>
+    <li>Data augmentation: flip, rotate, brightness shift — multiply dataset 3–5x</li>
+  </ul>
+  <div class="note">Tools: Google Images, Roboflow (free), Google Drive, Google Colab</div>
+</div>
+
+<div class="phase">
+  <h3>Phase 2 — Model 1: Image Triage (Quality Filter)</h3>
+  <ul>
+    <li>Goal: Reject unusable images before any tiger analysis runs</li>
+    <li>Input: Raw camera trap image</li>
+    <li>Output: One of 4 buckets — Clean / Partial / Unusable / False Positive</li>
+    <li>Algorithm: <strong>MobileNetV2</strong> (lightweight, fast, perfect for triage) with Transfer Learning</li>
+    <li>Training: Manually label ~200 images across 4 quality buckets</li>
+    <li>Threshold: If confidence &lt; 0.6 → flag for manual review</li>
+  </ul>
+  <div class="note">Why MobileNetV2: Fast, small, runs on free Colab GPU. Accuracy over speed is not needed at triage stage.</div>
+</div>
+
+<div class="phase">
+  <h3>Phase 3 — Model 2: Tiger Detection & Counting</h3>
+  <ul>
+    <li>Goal: Detect all tigers in a Clean Capture image, draw bounding boxes, count</li>
+    <li>Input: Quality-approved image from Model 1</li>
+    <li>Output: Number of tigers in frame + bounding box coordinates</li>
+    <li>Algorithm: <strong>YOLOv8n</strong> (nano — fastest, lowest memory, good for Colab free tier)</li>
+    <li>Fine-tune on annotated tiger images (Roboflow export → YOLO format)</li>
+    <li>Filters: Confidence threshold 0.35, box size &gt; 5% of frame</li>
+    <li>Handle multi-tiger frames: loop over all detected boxes</li>
+  </ul>
+  <div class="note">Key metric: mAP@0.5 &gt; 0.7 on validation set before moving to Phase 4</div>
+</div>
+
+<div class="phase">
+  <h3>Phase 4 — Model 3: Tiger Type Classifier</h3>
+  <ul>
+    <li>Goal: For each detected tiger crop — classify color morph AND subspecies</li>
+    <li>Input: Cropped tiger image (output of Model 2 bounding box)</li>
+    <li>Output: Color morph (Orange/White/Golden/Black/Snow White) + Subspecies (Bengal/Sumatran/Siberian/Malayan/S.China)</li>
+    <li>Algorithm: <strong>ResNet50</strong> Transfer Learning + custom classification head (2 output layers)</li>
+    <li>Layer 1 head: 5-class color morph softmax</li>
+    <li>Layer 2 head: 5-class subspecies softmax</li>
+    <li>Training data: Label each image with both type and subspecies</li>
+  </ul>
+  <div class="note">Note: Color morph can also be detected with rule-based HSV analysis (no training needed) — use as baseline before training.</div>
+</div>
+
+<div class="phase">
+  <h3>Phase 5 — Pipeline Integration & Deployment</h3>
+  <ul>
+    <li>Connect all 3 models in sequence: Image → Model 1 → Model 2 → Model 3 → Report</li>
+    <li>Output CSV: image name, quality bucket, tiger count, individual ID, color morph, subspecies</li>
+    <li>Simple upload interface: Gradio (free, runs in Colab — just run the cell and get a URL)</li>
+    <li>Forest officials upload folder of images → get summary report automatically</li>
+    <li>No manual intervention required</li>
+  </ul>
+  <div class="note">Deployment tool: <strong>Gradio</strong> (2 lines of code, runs in browser, no server needed)</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>5. Camera Trap Challenge Handling</h2>
+
+<table>
+  <tr><th>Challenge</th><th>Handling Approach</th><th>Bhargavi's Pipeline</th></tr>
+  <tr><td>False triggers (wind/leaves)</td><td>Model 1 → False Positive bucket</td><td><span class="badge done">Done — NO_DETECTION</span></td></tr>
+  <tr><td>Fog / haze / rain</td><td>Dark Channel Prior dehazing</td><td><span class="badge done">Done</span></td></tr>
+  <tr><td>Night / low light</td><td>CLAHE contrast enhancement</td><td><span class="badge done">Done</span></td></tr>
+  <tr><td>IR night = B&W image</td><td>Detect grayscale → convert to 3-channel</td><td><span class="badge gap">Not handled yet</span></td></tr>
+  <tr><td>Overexposure / whiteout</td><td>Detect mean brightness &gt; 240 → flag Unusable</td><td><span class="badge gap">Not handled yet</span></td></tr>
+  <tr><td>Motion blur</td><td>Laplacian variance &lt; threshold → flag Unusable</td><td><span class="badge gap">Not handled yet</span></td></tr>
+  <tr><td>Partial body / tail only</td><td>Box size filter (3–5% = Partial, &lt;3% = filtered)</td><td><span class="badge done">Done</span></td></tr>
+  <tr><td>Other animals (deer, birds)</td><td>YOLO class filter</td><td><span class="badge done">Done</span></td></tr>
+  <tr><td>Multiple tigers in frame</td><td>Loop over all YOLO boxes</td><td><span class="badge done">Done</span></td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>6. Tiger Classification Reference</h2>
+
+<h3>Group A — Subspecies by Stripe Pattern</h3>
+<table>
+  <tr><th>Subspecies</th><th>Stripe Density</th><th>Habitat</th></tr>
+  <tr><td>Sumatran</td><td>Most dense, narrowest, closest together</td><td>Dense Indonesian rainforests</td></tr>
+  <tr><td>Bengal</td><td>Moderate — 70–150 stripes, iconic black</td><td>Indian grasslands & forests</td></tr>
+  <tr><td>Siberian</td><td>Fewest, palest, widest spaced (dark brown not black)</td><td>Snow-covered Russian forests</td></tr>
+  <tr><td>Malayan</td><td>Few, thin stripes far apart</td><td>Malay Peninsula rainforests</td></tr>
+  <tr><td>South China</td><td>Broadest, most widely spaced — "王" forehead</td><td>Montane subtropical forests</td></tr>
+</table>
+
+<h3>Group B — Color Morphs</h3>
+<table>
+  <tr><th>Morph</th><th>Appearance</th><th>Detection Method</th></tr>
+  <tr><td>Orange (Standard)</td><td>Orange coat, black/dark brown stripes</td><td>HSV hue in orange range</td></tr>
+  <tr><td>White</td><td>White/cream coat, chocolate-brown stripes, blue eyes</td><td>High brightness, low saturation</td></tr>
+  <tr><td>Golden</td><td>Pale gold fur, faint blonde stripes</td><td>Yellow-gold hue, low contrast</td></tr>
+  <tr><td>Black (Pseudo-melanistic)</td><td>Stripes so thick they dominate — looks almost black</td><td>Very low brightness, dense stripe pattern</td></tr>
+  <tr><td>Snow White</td><td>Pure white, stripes absent or faint</td><td>Maximum brightness, near-zero stripe variance</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>7. What Bhargavi's Pipeline Still Needs</h2>
+
+<table>
+  <tr><th>Item</th><th>Priority</th><th>Effort</th></tr>
+  <tr><td>IR/grayscale night image handling</td><td>High</td><td>30 min — add to extract_fingerprint()</td></tr>
+  <tr><td>Overexposure / whiteout detection</td><td>High</td><td>30 min — add brightness check</td></tr>
+  <tr><td>Motion blur detection</td><td>Medium</td><td>30 min — Laplacian variance check</td></tr>
+  <tr><td>Image_Quality column in CSV</td><td>Medium</td><td>15 min — map to 4 buckets</td></tr>
+  <tr><td>Model 3 — Tiger type classifier</td><td>High</td><td>2–3 days — needs labelled type data</td></tr>
+  <tr><td>Gradio upload interface</td><td>Low (for now)</td><td>1 hour — for final submission demo</td></tr>
+</table>
+
+<br>
+<hr>
+<p style="color:#999;font-size:12px;">Reconstructed by Claude Code based on Mayank Tandon's shared Claude.ai session &nbsp;|&nbsp;
+Compiled: 29 May 2026 &nbsp;|&nbsp; EPAIB Batch 05, Group 4, IIM Lucknow</p>
+
+</body>
+</html>

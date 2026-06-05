@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Prof-PR Review — Dr. V S Prakash Attili</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 820px; margin: 40px auto; padding: 0 24px; color: #212121; background: #fafafa; }
+  .header { padding: 28px 28px 20px; border-radius: 8px 8px 0 0; }
+  .header h1 { margin: 0; font-size: 24px; }
+  .header p  { margin: 6px 0 0; font-size: 13px; opacity: 0.85; }
+  .body { background: white; border: 1px solid #e0e0e0; border-radius: 0 0 8px 8px; padding: 28px; }
+  h2 { font-size: 17px; border-bottom: 2px solid; padding-bottom: 6px; margin-top: 28px; }
+  h3 { font-size: 15px; margin-top: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { padding: 9px 13px; text-align: left; color: white; }
+  td { padding: 9px 13px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #f9f9f9; }
+  .verdict { padding: 14px 18px; border-radius: 6px; font-size: 14px; font-weight: bold; margin: 14px 0; }
+  .green  { background: #E8F5E9; color: #2E7D32; border-left: 5px solid #2E7D32; }
+  .amber  { background: #FFF8E1; color: #F57F17; border-left: 5px solid #F57F17; }
+  .red    { background: #FFEBEE; color: #C62828; border-left: 5px solid #C62828; }
+  .blue   { background: #E3F2FD; color: #0D47A1; border-left: 5px solid #0D47A1; }
+  .gap    { background: #FFF3E0; border-left: 4px solid #E65100; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .strong { background: #E8F5E9; border-left: 4px solid #2E7D32; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 8px 0; }
+  .action { background: #0D2B55; color: white; padding: 16px 20px; border-radius: 6px; margin-top: 24px; font-size: 13px; }
+  .action h3 { color: #90CAF9; margin-top: 0; }
+  .footer { margin-top: 32px; font-size: 11px; color: #999; text-align: center; }
+  ul { font-size: 13px; line-height: 2.0; }
+  p  { font-size: 13px; line-height: 1.7; }
+  code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="header" style="background:#4A148C; color:white;">
+  <h1>Prof-PR Review — Dr. V S Prakash Attili</h1>
+  <p>Data Science & Analytics | IIM Lucknow Visiting Faculty</p>
+</div>
+<div class="body">
+
+<div class="verdict amber">Overall Verdict: Correct architecture and problem decomposition. Data strategy is the primary risk to manage.</div>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Professor Profile</h2>
+<p><strong>Dr. V S Prakash Attili</strong> — Data Science, Analytics & Strategy.<br>
+Visiting Faculty: IIM Lucknow | EPAIB Batches 01–05.<br>
+<em>Taught: Data Science, Analytics, Business Strategy applications of ML.</em></p>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Architecture Assessment</h2>
+
+<div class="strong"><strong>3-Model Architecture is the right decision.</strong><br>
+One model trying to do everything — triage + detection + identity + classification — would have failed.
+The decomposition into Phase 1 (Triage), Phase 2 (Detection + Identity), Phase 3 (Classification) shows
+mature problem-solving thinking. This is how production ML systems are actually built.</div>
+
+<div class="strong"><strong>Preprocessing chain is strategically correct.</strong><br>
+CLAHE + Dark Channel Prior dehazing directly addresses the two dominant camera trap failure modes:
+low light (60-70% of Sundarbans images are night shots) and fog/rain scatter (monsoon conditions).
+This was not an obvious design decision — it demonstrates domain awareness.</div>
+
+<h2 style="border-color:#E65100; color:#E65100;">Primary Risk: Domain Shift</h2>
+
+<div class="gap"><strong>Training Data vs Production Data Mismatch</strong><br>
+The pipeline was built on Google Images of tigers — largely zoo photographs, wildlife documentaries,
+controlled lighting. The forest department's camera traps produce images that are fundamentally different:
+fixed position, motion-triggered, low resolution, varying weather, 24/7 operation.<br><br>
+This is called <strong>domain shift</strong> — the model learned from one data distribution but will run on another.
+A model trained on zoo tigers will not generalise well to Sundarbans camera trap images at 2AM in monsoon rain.</div>
+
+<h2 style="border-color:#1A4F8A; color:#1A4F8A;">Filter Rate Analysis</h2>
+<table>
+  <tr><th style="background:#0D2B55;">Metric</th><th style="background:#0D2B55;">This Run</th><th style="background:#0D2B55;">Interpretation</th></tr>
+  <tr><td>Total detections</td><td>190</td><td>YOLO found 190 bounding boxes across 187 images</td></tr>
+  <tr><td>Filtered out</td><td>142 (75%)</td><td>Wrong animal class / low confidence / partial body</td></tr>
+  <tr><td>Valid detections</td><td>33 (17%)</td><td>Passed all 3 filters — proceeded to identity matching</td></tr>
+  <tr><td>Unusable images</td><td>15 (8%)</td><td>Rejected at Phase 1 triage — blur/overexposure</td></tr>
+</table>
+<p>A 75% filter rate on Google Images is expected — YOLO is seeing many non-tiger images.
+On real forest department data where every image was triggered by animal motion, the filter rate should drop
+to 30-40%. If it stays high on real data, the YOLO proxy class strategy is failing and fine-tuning is urgent.</p>
+
+<h2 style="border-color:#E65100; color:#E65100;">Data Strategy Recommendations</h2>
+
+<div class="gap"><strong>Do not wait for all 1TB before retraining</strong><br>
+The moment 50 real camera trap images arrive from the forest department, use them immediately.
+Annotate with Roboflow, fine-tune YOLO, rerun the pipeline. Early validation on real data is worth
+more than waiting for complete data. Validate the domain fit as early as possible.</div>
+
+<div class="gap"><strong>Dataset balance not documented</strong><br>
+How many images per tiger type in your training data?
+If 90% are Orange Standard tigers, your color morph classifier will be biased.
+Document the class distribution and address imbalance before the final submission.</div>
+
+<h2 style="border-color:#2E7D32; color:#2E7D32;">What Is Well-Designed</h2>
+<div class="strong">Partial body handling protects database quality — a deliberate, correct engineering decision.</div>
+<div class="strong">Persistent JSON database — accumulates knowledge across multiple census sessions over time.</div>
+<div class="strong">Running average embedding — database improves with each tiger sighting. Intelligent design.</div>
+
+<div class="action">
+  <h3>Prof-PR's Action Items for Bhargavi</h3>
+  <ul>
+    <li>Document your training data composition — how many images per tiger type?</li>
+    <li>Request 50 real camera trap images from Mr. Anamitra Lahiri for early domain validation</li>
+    <li>Monitor filter rate when real data arrives — if still 75%, YOLO fine-tuning is urgent</li>
+    <li>Add domain shift as a documented risk in the limitations section of the PPT</li>
+  </ul>
+</div>
+
+</div>
+<div class="footer">
+  TRACE — Tiger Recognition And Census Engine &nbsp;|&nbsp;
+  EPAIB Batch 05, Group 4, IIM Lucknow &nbsp;|&nbsp;
+  Code Review Session — 30 May 2026
+</div>
+</body></html>

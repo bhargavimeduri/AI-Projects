@@ -38,7 +38,14 @@ Build an AI-powered image processing pipeline that:
 1. **Detects** — Is a tiger present in this image? (Binary classification)
 2. **Identifies** — Which individual tiger is this? (Multi-class classification using stripe patterns)
 3. **Counts** — How many tigers appear in this image? (Object detection)
-4. **Alerts** — Flag unusual activity (injured tiger, human presence, poaching indicators)
+4. **Enumerates** — How many *unique* individual tigers exist across all images? (Identity tracking using ResNet50 embeddings + cosine similarity — same tiger appearing in 10 images counts as 1, not 10)
+5. **Classifies Tiger Type** — What color morph is this tiger? (HSV stripe pattern analysis)
+   - Orange Standard (most common Bengal tiger)
+   - White Tiger (rare recessive gene)
+   - Golden Tiger (tabby gene — extremely rare)
+   - Black Tiger (pseudo-melanistic — very rare)
+   - Snow White Tiger (albino variant)
+6. **Alerts** — Flag unusual activity (injured tiger, human presence, poaching indicators)
 
 ---
 
@@ -48,6 +55,8 @@ Build an AI-powered image processing pipeline that:
 |--------|--------|
 | Detection Accuracy | > 90% |
 | Individual ID Accuracy | > 80% |
+| Unique Tiger Count Consistency | Same count across 2 independent runs (reproducibility) |
+| Color Morph Classification Consistency | Same morph per image across 2 independent runs |
 | False Negative Rate | < 5% (missing a tiger is worse than a false alarm) |
 | Processing Speed | < 2 seconds per image |
 
@@ -59,7 +68,10 @@ Build an AI-powered image processing pipeline that:
 - Image classification (tiger / no tiger)
 - Individual tiger identification from stripe patterns
 - Object detection for multiple tigers in one frame
+- Unique tiger enumeration across all images (de-duplicated count)
+- Tiger type classification by color morph (Orange / White / Golden / Black / Snow White)
 - Model evaluation and performance reporting
+- Reproducibility validation (devil's advocacy — two independent runs)
 
 **Out of Scope:**
 - Real-time camera trap integration (future phase)

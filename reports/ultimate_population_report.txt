@@ -1,0 +1,93 @@
+=================================================================
+   FOREST TIGER POPULATION REPORT — v3.0 FUSED PIPELINE
+=================================================================
+  Generated        : 2026-06-04 09:26:50
+  Survey Location  : Sundarbans Tiger Reserve | Block-A / Sector-3
+  Detection Chain  : YOLOv8n-OIV7 -> COCO-proxy -> Whole-image
+  Species Gate     : ResNet50 top-3 tiger verification
+  Identity Method  : Cosine Similarity (threshold 0.83)
+  ViewPoint Census : Left_Flank / Right_Flank / Frontal
+=================================================================
+
+  IMAGE PROCESSING SUMMARY
+  ----------------------------------------
+  Total images processed  : 13
+  Images with tigers      : 9
+  Images with no tiger    : 4
+  Unusable images         : 0
+  Total tiger detections  : 13
+
+  PER-IMAGE BREAKDOWN
+  ----------------------------------------
+  Image                            Quality                Tiger?     Count   Tiger IDs
+  -----------------------------------------------------------------------------------------------
+  004996.jpg                       Clean                  YES        1       Unknown_Partial
+  005004.jpg                       Clean                  YES        1       Tiger_001
+  005010.jpg                       Clean                  YES        1       Tiger_002
+  005016.jpg                       Clean                  YES        1       Tiger_001
+  005021.jpg                       Clean                  YES        1       Tiger_001
+  007000.jpeg                      Clean                  no         0       —
+  007001.jpeg                      IR_Night               no         0       —
+  007002.jpeg                      Clean                  no         0       —
+  007003.jpeg                      Clean                  no         0       —
+  007004.jpeg                      Clean                  YES        1       Tiger_001
+  007005.jpeg                      Clean                  YES        4       Tiger_001, Tiger_003
+  007010.jpeg                      Clean                  YES        1       Tiger_001
+  008001.jpeg                      Clean                  YES        2       Tiger_001, Tiger_004
+  -----------------------------------------------------------------------------------------------
+
+  CENSUS RESULTS
+  ----------------------------------------
+  Raw unique IDs in DB    : 4
+  ViewPoint-aware count
+    Left-flank only       : 1 unique IDs
+    Right-flank only      : 1 unique IDs
+    Frontal only          : 5 unique IDs
+  CONSERVATIVE ESTIMATE   : 5
+  (= max of L/R/F counts — avoids counting same tiger twice)
+  LIBERAL ESTIMATE        : 5
+  (= union of all IDs — upper bound)
+
+  DETECTION SOURCE BREAKDOWN
+  ----------------------------------------
+  OIV7_Direct                 :   9  ( 69.2%)  #############
+  COCO_Proxy                  :   3  ( 23.1%)  ####
+  Remainder_T                 :   1  (  7.7%)  #
+
+  COLOUR MORPH BREAKDOWN
+  ----------------------------------------
+  Orange Tiger              :  11  ( 84.6%)  #####################
+  Black Tiger               :   1  (  7.7%)  #
+  Golden Tiger              :   1  (  7.7%)  #
+
+  INDIVIDUAL SIGHTING COUNTS
+  ----------------------------------------
+  Tiger_001     : 4 sighting(s)   ViewPoints: Frontal, Left_Flank, Right_Flank
+  Tiger_002     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_003     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_004     : 1 sighting(s)   ViewPoints: Frontal
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!  UNCERTAIN IMAGES — HUMAN CONFIRMATION NEEDED        !!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  The pipeline is NOT fully confident about the detections
+  listed below. These are BEST-GUESS predictions only.
+  Please look at each image and confirm the tiger count.
+  -------------------------------------------------------------
+  IMAGE : 004996.jpg
+    My prediction  : 1 tiger(s)  →  Unknown_Partial
+    Uncertain (Unknown_Partial) : new enrollment with extremely low match score 0.00 — no close DB match found at all
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  OUTPUT FILES
+  ----------------------------------------
+  CSV Report       : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\ultimate_population_report.csv
+  Image Summary    : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\ultimate_image_summary.csv
+  Identity DB      : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\ultimate_tiger_db.json
+  Annotated images : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\ultimate_annotated
+  Grad-CAM outputs : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\ultimate_gradcam
+
+=================================================================
+  END OF REPORT — TIGER AI ULTIMATE v3.0
+=================================================================
