@@ -111,6 +111,283 @@ from ultralytics import YOLO
 warnings.filterwarnings("ignore")  # Suppress PyTorch deprecation warnings
 
 # ══════════════════════════════════════════════════════════════════════════════
+# SECTION 0 — TRAINING
+# Two-stage training pipeline. Run BEFORE inference on a new dataset.
+#
+# STAGE 1 — YOLOv8 Tiger Detector (custom fine-tune on your labeled data):
+#   py -3 src/tiger_ai_ultimate.py --train --stage yolo
+#
+# STAGE 2 — ResNet50 Tiger/No-Tiger Detection (TensorFlow, transfer learning):
+#   py -3 src/tiger_ai_ultimate.py --train --stage detection
+#
+# STAGE 3 — EfficientNetB3 Individual Identification (TensorFlow, fine-tune):
+#   py -3 src/tiger_ai_ultimate.py --train --stage identification
+#
+# NOTE: TensorFlow imports are lazy (loaded only when --train is used) so the
+# inference pipeline runs fine without TF installed.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def train_yolo(data_yaml: str, epochs: int = 50, batch: int = 16,
+               imgsz: int = 640, model_dir: str = "models"):
+    """
+    Fine-tune YOLOv8n on a custom labeled tiger dataset.
+
+    Expects a data.yaml file pointing to train/val image folders with YOLO
+    format labels (.txt files with class_id x_center y_center width height).
+
+    Args:
+        data_yaml  : Path to dataset YAML (e.g. 'data/tiger_dataset.yaml')
+        epochs     : Number of training epochs (default 50)
+        batch      : Images per batch — reduce to 8 on CPU (default 16)
+        imgsz      : Training image size (default 640)
+        model_dir  : Folder to save the best trained weights
+
+    After training the best weights are saved to:
+        models/yolo_training/tiger_detector_v1/weights/best.pt
+
+    Use best.pt in inference by replacing yolov8n-oiv7.pt in SECTION 4.
+    """
+    print("\n" + "=" * 60)
+    print("STAGE 1: YOLOv8 Tiger Detector — Custom Fine-Tune")
+    print("=" * 60)
+    print(f"  Dataset YAML : {data_yaml}")
+    print(f"  Epochs       : {epochs}")
+    print(f"  Batch size   : {batch}")
+    print(f"  Image size   : {imgsz}x{imgsz}")
+
+    detector = YOLO("yolov8n.pt")   # Start from COCO pretrained weights
+    results = detector.train(
+        data=data_yaml,
+        epochs=epochs,
+        imgsz=imgsz,
+        batch=batch,
+        project=f"{model_dir}/yolo_training",
+        name="tiger_detector_v1",
+        patience=10,           # Stop early if no improvement for 10 epochs
+        augment=True,          # Built-in mosaic, flip, HSV augmentation
+        cache=False,           # Set True if RAM > 16 GB for faster epochs
+        device=0 if torch.cuda.is_available() else "cpu",
+        verbose=True,
+    )
+    best_weights = f"{model_dir}/yolo_training/tiger_detector_v1/weights/best.pt"
+    print(f"\n  Best weights saved → {best_weights}")
+    print("  Use this path in SECTION 4 to replace yolov8n-oiv7.pt.\n")
+    return results
+
+
+def train_detection_model(data_dir: str = "data/processed", model_dir: str = "models",
+                          epochs_phase1: int = 20, epochs_phase2: int = 10,
+                          batch_size: int = 32):
+    """
+    Train ResNet50 to classify Tiger vs No-Tiger (binary detection).
+
+    Two-phase transfer learning:
+      Phase 1 (Frozen):   Only the top Dense layers train.
+                          High learning rate (1e-4). Fast convergence.
+      Phase 2 (Fine-tune): Top 30 ResNet50 layers unfrozen.
+                           Low learning rate (1e-5). Squeezes extra accuracy.
+
+    Expects data_dir/train/ and data_dir/val/ with subfolders:
+        tiger/      — images containing tigers
+        no_tiger/   — images without tigers
+
+    Saves model to models/detection_best.h5 and models/detection_final.h5
+    """
+    import tensorflow as tf
+    from tensorflow.keras.applications import ResNet50
+    from tensorflow.keras import layers, Model
+    from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+    print("\n" + "=" * 60)
+    print("STAGE 2: Tiger Detection — ResNet50 Transfer Learning")
+    print("=" * 60)
+
+    train_dir = Path(data_dir) / "train"
+    val_dir   = Path(data_dir) / "val"
+
+    datagen_train = ImageDataGenerator(
+        rescale=1.0 / 255,
+        horizontal_flip=True,
+        rotation_range=20,
+        brightness_range=[0.7, 1.3],
+        zoom_range=0.15,
+    )
+    datagen_val = ImageDataGenerator(rescale=1.0 / 255)
+
+    train_gen = datagen_train.flow_from_directory(
+        str(train_dir), target_size=(224, 224),
+        batch_size=batch_size, class_mode="binary",
+    )
+    val_gen = datagen_val.flow_from_directory(
+        str(val_dir), target_size=(224, 224),
+        batch_size=batch_size, class_mode="binary",
+    )
+
+    # Build ResNet50 detection model
+    base = ResNet50(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
+    base.trainable = False
+    inputs  = tf.keras.Input(shape=(224, 224, 3))
+    x       = base(inputs, training=False)
+    x       = layers.GlobalAveragePooling2D()(x)
+    x       = layers.Dense(256, activation="relu")(x)
+    x       = layers.Dropout(0.5)(x)
+    outputs = layers.Dense(1, activation="sigmoid")(x)
+    model   = Model(inputs, outputs, name="tiger_detection")
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(1e-4),
+        loss="binary_crossentropy",
+        metrics=["accuracy", tf.keras.metrics.AUC(name="auc")],
+    )
+
+    Path(model_dir).mkdir(parents=True, exist_ok=True)
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            monitor="val_auc", patience=5, restore_best_weights=True, mode="max"),
+        tf.keras.callbacks.ModelCheckpoint(
+            f"{model_dir}/detection_best.h5",
+            monitor="val_auc", save_best_only=True, mode="max"),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            monitor="val_loss", factor=0.5, patience=3, min_lr=1e-7),
+    ]
+
+    print(f"\n  Phase 1 — Frozen base ({epochs_phase1} epochs)")
+    model.fit(train_gen, validation_data=val_gen,
+              epochs=epochs_phase1, callbacks=callbacks)
+
+    print(f"\n  Phase 2 — Fine-tuning top 30 ResNet50 layers ({epochs_phase2} epochs)")
+    base.trainable = True
+    for layer in base.layers[:-30]:
+        layer.trainable = False
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(1e-5),
+        loss="binary_crossentropy",
+        metrics=["accuracy", tf.keras.metrics.AUC(name="auc")],
+    )
+    model.fit(train_gen, validation_data=val_gen,
+              epochs=epochs_phase2, callbacks=callbacks)
+
+    val_loss, val_acc, val_auc = model.evaluate(val_gen, verbose=0)
+    print(f"\n  Detection Results:")
+    print(f"    Val Accuracy : {val_acc:.4f}  (target >0.90)")
+    print(f"    Val AUC      : {val_auc:.4f}")
+
+    model.save(f"{model_dir}/detection_final.h5")
+    print(f"  Model saved → {model_dir}/detection_final.h5\n")
+
+
+def train_identification_model(data_dir: str = "data/processed", model_dir: str = "models",
+                                num_tigers: int = 50, epochs: int = 30, batch_size: int = 32):
+    """
+    Fine-tune EfficientNetB3 to identify individual tigers by stripe pattern.
+
+    Each tiger gets its own subfolder:
+        data_dir/train/Tiger_001/  ← images of Tiger 001
+        data_dir/train/Tiger_002/  ← images of Tiger 002
+        ...
+
+    Two-phase:
+      Phase 1 — Top layers only (frozen EfficientNetB3 base)
+      Phase 2 — Fine-tune top 30 EfficientNetB3 layers (lower LR)
+
+    Saves model to models/identification_best.h5 and tiger_class_map.json
+    """
+    import tensorflow as tf
+    from tensorflow.keras.applications import EfficientNetB3
+    from tensorflow.keras import layers, Model
+    from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+    print("\n" + "=" * 60)
+    print("STAGE 3: Individual Tiger ID — EfficientNetB3 Fine-Tune")
+    print("=" * 60)
+
+    train_dir = Path(data_dir) / "train"
+    val_dir   = Path(data_dir) / "val"
+
+    datagen_train = ImageDataGenerator(
+        rescale=1.0 / 255,
+        horizontal_flip=True,
+        rotation_range=15,
+        brightness_range=[0.7, 1.3],
+        zoom_range=0.1,
+    )
+    datagen_val = ImageDataGenerator(rescale=1.0 / 255)
+
+    train_gen = datagen_train.flow_from_directory(
+        str(train_dir), target_size=(300, 300),
+        batch_size=batch_size, class_mode="categorical",
+    )
+    val_gen = datagen_val.flow_from_directory(
+        str(val_dir), target_size=(300, 300),
+        batch_size=batch_size, class_mode="categorical",
+    )
+
+    num_classes = train_gen.num_classes
+    print(f"  Found {num_classes} tiger classes")
+
+    # Build EfficientNetB3 identification model
+    base = EfficientNetB3(weights="imagenet", include_top=False, input_shape=(300, 300, 3))
+    for layer in base.layers[:-20]:
+        layer.trainable = False
+    inputs  = tf.keras.Input(shape=(300, 300, 3))
+    x       = base(inputs, training=False)
+    x       = layers.GlobalAveragePooling2D()(x)
+    x       = layers.Dense(512, activation="relu")(x)
+    x       = layers.Dropout(0.4)(x)
+    outputs = layers.Dense(num_classes, activation="softmax")(x)
+    model   = Model(inputs, outputs, name="tiger_identification")
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(5e-5),
+        loss="categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+
+    Path(model_dir).mkdir(parents=True, exist_ok=True)
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            monitor="val_accuracy", patience=7, restore_best_weights=True, mode="max"),
+        tf.keras.callbacks.ModelCheckpoint(
+            f"{model_dir}/identification_best.h5",
+            monitor="val_accuracy", save_best_only=True, mode="max"),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            monitor="val_loss", factor=0.5, patience=3, min_lr=1e-7),
+    ]
+
+    epochs_p1 = max(1, epochs - 10)
+    epochs_p2 = min(10, epochs)
+
+    print(f"\n  Phase 1 — Frozen base ({epochs_p1} epochs)")
+    model.fit(train_gen, validation_data=val_gen,
+              epochs=epochs_p1, callbacks=callbacks)
+
+    print(f"\n  Phase 2 — Fine-tuning top 30 EfficientNetB3 layers ({epochs_p2} epochs)")
+    base.trainable = True
+    for layer in base.layers[:-30]:
+        layer.trainable = False
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(1e-5),
+        loss="categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    model.fit(train_gen, validation_data=val_gen,
+              epochs=epochs_p2, callbacks=callbacks)
+
+    val_loss, val_acc = model.evaluate(val_gen, verbose=0)
+    print(f"\n  Identification Results:")
+    print(f"    Val Accuracy : {val_acc:.4f}  (target >0.80)")
+
+    model.save(f"{model_dir}/identification_final.h5")
+
+    # Save class → tiger label mapping (Tiger_001, Tiger_002, …)
+    import json as _json
+    class_map = {str(v): k for k, v in train_gen.class_indices.items()}
+    with open(f"{model_dir}/tiger_class_map.json", "w") as f:
+        _json.dump(class_map, f, indent=2)
+
+    print(f"  Model saved     → {model_dir}/identification_final.h5")
+    print(f"  Class map saved → {model_dir}/tiger_class_map.json\n")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # SECTION 1 — SETUP & CONFIGURATION
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -2669,22 +2946,89 @@ def run_population_report(data_dir=None, run_gradcam=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Tiger AI Ultimate — Fused Multi-Source Pipeline v3.0")
+        description="Tiger AI Ultimate — End-to-End Pipeline v3.0  |  EPAIB Batch 05 Group 4",
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog="""
+INFERENCE (default):
+  py -3 src/tiger_ai_ultimate.py                         # batch run on sample data
+  py -3 src/tiger_ai_ultimate.py --data path/to/images   # custom image folder
+  py -3 src/tiger_ai_ultimate.py --image tiger.jpg       # single image
+  py -3 src/tiger_ai_ultimate.py --gradcam               # with Grad-CAM heatmaps
+
+TRAINING:
+  py -3 src/tiger_ai_ultimate.py --train --stage yolo --data-yaml data/tiger_dataset.yaml
+  py -3 src/tiger_ai_ultimate.py --train --stage detection --train-data data/processed
+  py -3 src/tiger_ai_ultimate.py --train --stage identification --train-data data/processed
+        """,
+    )
+    # ── Inference flags ───────────────────────────────────────────────────────
     parser.add_argument("--image",   type=str, default=None,
                         help="Analyse a single image by filename or full path")
     parser.add_argument("--data",    type=str, default=None,
-                        help="Path to image folder (default: data/sample/tigers/train)")
+                        help="Path to image folder for batch inference")
     parser.add_argument("--gradcam", action="store_true",
                         help="Generate Grad-CAM visualisations for each detection")
+    # ── Training flags ────────────────────────────────────────────────────────
+    parser.add_argument("--train",   action="store_true",
+                        help="Run training instead of inference")
+    parser.add_argument("--stage",   type=str, default="yolo",
+                        choices=["yolo", "detection", "identification"],
+                        help="Which training stage to run (default: yolo)")
+    parser.add_argument("--train-data", type=str, default="data/processed",
+                        help="Path to processed training data folder")
+    parser.add_argument("--data-yaml",  type=str, default="data/tiger_dataset.yaml",
+                        help="Path to YOLO data.yaml (yolo stage only)")
+    parser.add_argument("--epochs",     type=int, default=None,
+                        help="Override number of training epochs")
+    parser.add_argument("--batch-size", type=int, default=16,
+                        help="Training batch size (default 16; reduce to 8 on CPU)")
+    parser.add_argument("--model-dir",  type=str, default="models",
+                        help="Folder to save trained model weights")
+    parser.add_argument("--num-tigers", type=int, default=50,
+                        help="Number of individual tiger classes (identification stage)")
     args = parser.parse_args()
 
-    if args.image:
-        load_db()
-        img_path = DATA_DIR / args.image
-        if not img_path.exists():
-            img_path = Path(args.image)
-        result = analyze_image(img_path, show_summary=True,
-                               run_gradcam=args.gradcam)
-        save_db()
+    if args.train:
+        # ── TRAINING MODE ─────────────────────────────────────────────────────
+        print("\n" + "█" * 65)
+        print("  TIGER AI ULTIMATE — TRAINING MODE")
+        print("  EPAIB Batch 05 | Group 4 | IIM Lucknow")
+        print("█" * 65)
+        if args.stage == "yolo":
+            epochs = args.epochs or 50
+            train_yolo(
+                data_yaml=args.data_yaml,
+                epochs=epochs,
+                batch=args.batch_size,
+                model_dir=args.model_dir,
+            )
+        elif args.stage == "detection":
+            epochs = args.epochs or 30
+            train_detection_model(
+                data_dir=args.train_data,
+                model_dir=args.model_dir,
+                epochs_phase1=max(1, epochs - 10),
+                epochs_phase2=min(10, epochs),
+                batch_size=args.batch_size,
+            )
+        elif args.stage == "identification":
+            epochs = args.epochs or 30
+            train_identification_model(
+                data_dir=args.train_data,
+                model_dir=args.model_dir,
+                num_tigers=args.num_tigers,
+                epochs=epochs,
+                batch_size=args.batch_size,
+            )
     else:
-        run_population_report(data_dir=args.data, run_gradcam=args.gradcam)
+        # ── INFERENCE MODE ────────────────────────────────────────────────────
+        if args.image:
+            load_db()
+            img_path = DATA_DIR / args.image
+            if not img_path.exists():
+                img_path = Path(args.image)
+            result = analyze_image(img_path, show_summary=True,
+                                   run_gradcam=args.gradcam)
+            save_db()
+        else:
+            run_population_report(data_dir=args.data, run_gradcam=args.gradcam)
