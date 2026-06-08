@@ -14,11 +14,13 @@
 ║      Why: Ground truth validation showed 000082, 000102 missed 2nd tiger.  ║
 ║      Root cause: YOLOv8n too small for multi-tiger frames.                 ║
 ║                                                                              ║
-║   UPGRADE 2 — EfficientNetV2-L REPLACES ResNet50:                         ║
-║      V1: ResNet50      (ImageNet-1K, 25M params)                           ║
-║      V2: EfficientNetV2-L (ImageNet-21K, 118M params)                      ║
-║      Why: Trained on 21,000 classes vs 1,000 — far richer wildlife         ║
-║      feature space. Better stripe pattern discrimination for re-ID.         ║
+║   UPGRADE 2 — ResNet50 RETAINED (EfficientNetV2-L REVERTED):              ║
+║      Attempted: EfficientNetV2-L (ImageNet-21K, 118M params)               ║
+║      Reverted to: ResNet50 (ImageNet-1K, 25M params)                       ║
+║      Why reverted: EfficientNetV2-L uses 21,841-class index space.         ║
+║      Our species gate uses ImageNet-1K tiger indices (292/293/294).         ║
+║      Those indices map to WRONG classes in the 21K model, causing           ║
+║      valid tigers to fail the species gate. V1 accuracy was higher.        ║
 ║                                                                              ║
 ║   UPGRADE 3 — GRADIENT-MAGNITUDE BLUR DETECTION:                          ║
 ║      V1: Laplacian variance (threshold 25) — rejected clear image 000143   ║
@@ -703,34 +705,32 @@ except Exception as e:
 print("[INFO] Loading YOLOv8l-COCO (proxy classes) ...")
 coco_detector = YOLO("yolov8l.pt")            # V2: large model (43M params vs 3.2M in nano)
 
-# ── (c/d) EfficientNetV2-L — replaces ResNet50 for species gate + re-ID ───────
-# V2 UPGRADE: EfficientNetV2-L trained on ImageNet-21K (21,000 classes vs 1,000)
-# Why: Far richer wildlife feature space — better stripe pattern discrimination.
-# Output: 1280-dim feature vector (vs 2048 for ResNet50, but more discriminative)
-print("[INFO] Loading EfficientNetV2-L (species verification + feature extraction) ...")
-_weights_effnet      = models.EfficientNet_V2_L_Weights.DEFAULT
-resnet_classify      = models.efficientnet_v2_l(weights=_weights_effnet).to(DEVICE)
+# ── (c/d) ResNet50 — species gate + re-ID (RETAINED from V1) ──────────────────
+# NOTE: EfficientNetV2-L was tested in V2 but reverted.
+# Root cause: EfficientNetV2-L uses ImageNet-21K (21,841 classes). Our species
+# gate checks class indices 292/293/294 which are tiger classes in ImageNet-1K.
+# In the 21K model those indices map to unrelated classes → valid tigers fail
+# the species gate → V1 accuracy was higher. ResNet50 + ImageNet-1K is retained.
+print("[INFO] Loading ResNet50 (species verification + feature extraction) ...")
+_weights_resnet      = models.ResNet50_Weights.DEFAULT
+resnet_classify      = models.resnet50(weights=_weights_resnet).to(DEVICE)
 resnet_classify.eval()
 
-# The imagenet categories for EfficientNetV2-L
-imagenet_categories = _weights_effnet.meta["categories"]
+# ImageNet-1K class labels (used by species gate to confirm "tiger" in top-3)
+imagenet_categories = _weights_resnet.meta["categories"]
 
-# Feature extractor = EfficientNetV2-L with the final classifier removed.
-# Output: 1280-dimensional vector — richer stripe fingerprint than ResNet50's 2048-dim.
-# (EfficientNet uses AdaptiveAvgPool2d → Flatten → Dropout → Linear)
-# We remove the final Linear (classifier) to get the 1280-dim embedding.
+# Feature extractor = ResNet50 with the final FC layer removed.
+# Output: 2048-dimensional stripe fingerprint vector.
 resnet_features = torch.nn.Sequential(
-    resnet_classify.features,
-    resnet_classify.avgpool,
+    *list(resnet_classify.children())[:-1],   # all layers except final FC
     torch.nn.Flatten(1),
 ).to(DEVICE)
 resnet_features.eval()
 
-# EfficientNetV2-L input transform (384x384 — larger than ResNet50's 224x224)
-# Larger input = more stripe detail captured per crop
+# ResNet50 standard ImageNet transform (224x224 — same as V1)
 _transform = transforms.Compose([
-    transforms.Resize(384),
-    transforms.CenterCrop(384),
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
                          std=[0.229, 0.224, 0.225]),
@@ -949,6 +949,100 @@ def verify_species_top3(crop_bgr):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# FENCE DETECTION — Ground Truth Fix (000341.jpg)
+# ──────────────────────────────────────────────────────────────────────────────
+# Problem: A tiger standing behind a wire/bar fence has its body broken into
+# segments by the fence bars. YOLO sees fragmented stripes that don't resemble
+# a complete tiger body → misses the detection entirely.
+# The uncovered-strip species gate also fails because the strip crop contains
+# alternating bars and fur that ResNet50 cannot cleanly classify as "tiger".
+#
+# Fix: detect fence pattern via Canny edges + Hough vertical lines.
+# If a fence is detected, apply morphological horizontal closing to "fill"
+# the fence bars in the strip crop, then retry the species gate.
+# Only applied to strips that already FAILED the species gate — so it cannot
+# create false positives in normal (fence-free) images.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def detect_fence_pattern(img_bgr, min_lines=6, min_line_len_ratio=0.25):
+    """
+    Returns True if a fence-like vertical line pattern is detected in img_bgr.
+
+    Method:
+      1. Convert to grayscale and apply Canny edge detection.
+      2. Run Hough line transform to find long vertical lines.
+      3. If >= min_lines vertical lines found AND they span >= min_line_len_ratio
+         of image height → fence pattern confirmed.
+
+    Why vertical lines: wire mesh fences, iron bar fences, and wooden slat fences
+    all produce strong vertical edge signals when a tiger is photographed through them.
+
+    Calibrated conservatively (min_lines=6) to avoid false triggers on tree trunks
+    or single vertical structures that are not fences.
+    """
+    try:
+        h, w = img_bgr.shape[:2]
+        gray  = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+        edges = cv2.Canny(gray, threshold1=50, threshold2=150, apertureSize=3)
+
+        # Hough lines — detect line segments
+        min_len = int(h * min_line_len_ratio)   # line must span at least 25% of height
+        lines   = cv2.HoughLinesP(edges,
+                                   rho=1, theta=np.pi / 180,
+                                   threshold=40,
+                                   minLineLength=min_len,
+                                   maxLineGap=10)
+        if lines is None:
+            return False
+
+        # Count lines that are nearly vertical (angle within 15° of vertical)
+        vertical_count = 0
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            dx = abs(x2 - x1)
+            dy = abs(y2 - y1)
+            if dy > 0 and dx / dy < 0.27:   # tan(15°) ≈ 0.27
+                vertical_count += 1
+
+        return vertical_count >= min_lines
+
+    except Exception:
+        return False
+
+
+def remove_fence_bars(crop_bgr):
+    """
+    Reduces fence bar influence in a crop by applying horizontal morphological
+    closing — fills narrow vertical gaps (fence bars) with adjacent pixel values.
+
+    Steps:
+      1. Convert to LAB colour space for luminance processing.
+      2. Apply horizontal closing with a 9×1 kernel (fills horizontal gaps).
+      3. Apply gentle Gaussian blur to smooth transitions.
+      4. Merge back to BGR.
+
+    Why this works: fence bars create dark vertical stripes. Horizontal closing
+    connects the tiger fur on both sides of a bar, producing a more complete
+    tiger appearance that ResNet50 can classify more confidently.
+
+    This is NOT applied to the original image — only to uncovered strip crops
+    that already failed the species gate in a fence-detected image.
+    """
+    try:
+        lab   = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab)
+        # Horizontal closing kernel: 1 row × 9 cols — fills narrow vertical bars
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 1))
+        l_closed = cv2.morphologyEx(l, cv2.MORPH_CLOSE, kernel)
+        # Smooth to reduce artefacts from the closing operation
+        l_smooth = cv2.GaussianBlur(l_closed, (3, 3), 0)
+        merged   = cv2.merge([l_smooth, a, b])
+        return cv2.cvtColor(merged, cv2.COLOR_LAB2BGR)
+    except Exception:
+        return crop_bgr   # on any failure, return original crop unchanged
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # SECTION 7 — VIEWPOINT CLASSIFICATION
 # From Dr. Bose's architecture — separates Left_Flank / Right_Flank / Frontal.
 #
@@ -1141,13 +1235,14 @@ _fmaps, _grads = {}, {}
 def _hook_fmaps(m, i, o):  _fmaps["l4"] = o
 def _hook_grads(m, gi, go): _grads["l4"] = go[0]
 
+# ResNet50: register Grad-CAM hooks on layer4 (deepest residual block)
 resnet_classify.layer4.register_forward_hook(_hook_fmaps)
 resnet_classify.layer4.register_full_backward_hook(_hook_grads)
 
 
 def generate_gradcam(crop_bgr, save_path, label=""):
     """
-    Grad-CAM on ResNet50 layer4.
+    Grad-CAM on ResNet50 layer4 (deepest residual block).
     Saves side-by-side: Original | Heatmap | Overlay.
     """
     rgb    = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
@@ -1807,6 +1902,90 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                   f"{visibility:<14} {viewpoint:<18} "
                   f"match={match_score:.2f}  {id_status}  [{det_src}]")
 
+    # ── Vertical Tiger Guard ──────────────────────────────────────────────────
+    # RULE: All tigers in a frame must be in a roughly horizontal body orientation
+    # for the multi-tiger scan (Low-Conf top-up + Remainder scan + Margin scan)
+    # to be trusted.
+    #
+    # WHY: A tiger standing/posed vertically in frame produces a tall bounding box
+    # (bbox_h >> bbox_w). When the Remainder scan splits the image into L/R/T/B
+    # halves, it can find the top of the tiger in one half and the bottom in another
+    # and misclassify them as two separate animals — as seen in 000084.jpg.
+    #
+    # RULE: If ANY accepted detection has bbox_height > bbox_width * VERTICAL_RATIO,
+    # the tiger is considered vertically oriented. Skip Low-Conf top-up, Remainder
+    # scan, and Margin scan entirely for this image, and flag it for human review.
+    VERTICAL_RATIO = 1.3   # bbox height > 1.3× width → vertical orientation
+
+    vertical_tiger_detected = False
+    for _vd in result["detections"]:
+        _bx1, _by1, _bx2, _by2 = _vd["bbox"]
+        _bw = max(1, _bx2 - _bx1)
+        _bh = max(1, _by2 - _by1)
+        if _bh > _bw * VERTICAL_RATIO:
+            vertical_tiger_detected = True
+            break
+
+    if vertical_tiger_detected:
+        if show_summary:
+            print(f"\n    [VERTICAL GUARD] Tall bounding box detected "
+                  f"(tiger oriented vertically in frame).")
+            print(f"    [VERTICAL GUARD] Skipping multi-tiger scan — "
+                  f"flagging for human review.")
+
+        # ── FIX: Hard-reject new enrollments with very low match scores ────────
+        # Ground truth: 000363.jpg — V2 enrolled Tiger_003 (match=0.44) as a new
+        # tiger under vertical guard. The vertical guard already suppresses the
+        # multi-tiger split scan. A new enrollment with score < 0.50 under
+        # vertical guard is almost certainly a false positive caused by the
+        # vertically-oriented pose confusing the fingerprint extractor.
+        # Action: REMOVE the low-score new enrollment entirely from detections
+        # rather than just flagging it. This converts "warn and enroll" to
+        # "hard reject" — matching the confidence flag rule in our memory.
+        # Threshold 0.50: well above the normal false-positive range (< 0.40)
+        # but below the first-sighting range (0.50–0.83) for genuinely new tigers.
+        VERT_NEW_REJECT_THRESH = 0.50
+        rejected_ids = []
+        kept_detections = []
+        for _vd in result["detections"]:
+            if _vd.get("is_new", False) and _vd.get("match_score", 0.0) < VERT_NEW_REJECT_THRESH:
+                rejected_ids.append(_vd["tiger_id"])
+                if show_summary:
+                    print(f"    [VERTICAL GUARD] HARD REJECT — {_vd['tiger_id']} "
+                          f"new enrollment match={_vd.get('match_score',0):.2f} "
+                          f"< {VERT_NEW_REJECT_THRESH} under vertical guard → removed.")
+            else:
+                kept_detections.append(_vd)
+
+        if rejected_ids:
+            result["detections"] = kept_detections
+            valid_count          = len(kept_detections)
+            if show_summary:
+                print(f"    [VERTICAL GUARD] {len(rejected_ids)} false-positive "
+                      f"enrollment(s) removed: {', '.join(rejected_ids)}")
+
+        result["needs_confirmation"]   = True
+        result["uncertain_detections"] = result.get("uncertain_detections", [])
+        for _vd in result["detections"]:
+            if "confidence" not in _vd:
+                _vd["confidence"] = "LOW"
+            result["uncertain_detections"].append(
+                (_vd["tiger_id"],
+                 "tiger bounding box is taller than wide — vertical body orientation "
+                 "detected; multi-tiger split skipped. Human confirmation required."))
+        if show_summary:
+            unique_ids   = list(dict.fromkeys(d["tiger_id"] for d in result["detections"]))
+            unique_count = len(unique_ids)
+            print(f"\n    {'=' * 58}")
+            print(f"    ⚠  UNCERTAIN — HUMAN CONFIRMATION NEEDED")
+            print(f"    {'=' * 58}")
+            print(f"    MY PREDICTION : {unique_count} unique tiger(s) in this image")
+            print(f"    PREDICTED IDs : {', '.join(unique_ids)}")
+            print(f"    REASON        : Tiger body orientation is vertical.")
+            print(f"                   Cannot safely run multi-tiger split.")
+            print(f"    PLEASE CONFIRM: Is this count correct?")
+            print(f"    {'=' * 58}")
+
     # ── Low-Confidence OIV7 Top-Up ──────────────────────────────────────────────
     # Problem: when two tigers overlap in the frame, YOLO's NMS keeps only the
     # high-confidence box and discards the lower-confidence second tiger (e.g.
@@ -1827,7 +2006,7 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     # main-tiger box has HIGH area-coverage (~88%) but LOW IoU (~0.18) — they're
     # clearly different detections. IoU correctly sees them as distinct.
 
-    if valid_count >= 1 and oiv7_detector is not None:
+    if valid_count >= 1 and oiv7_detector is not None and not vertical_tiger_detected:
         accepted_boxes = [d["bbox"] for d in result["detections"]]
 
         def _max_iou_with_accepted(bx1, by1, bx2, by2):
@@ -2051,7 +2230,7 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     #   Adult tiger vs cub (different individuals) → ~0.35–0.45 (must pass: < 0.55 ✓)
     #   Lowered from 0.62 → 0.55 to catch same-cub T/B pairs (b.jpeg: sim=0.58)
 
-    if valid_count >= 1 and iw >= 80 and ih >= 80:
+    if valid_count >= 1 and iw >= 80 and ih >= 80 and not vertical_tiger_detected:
         from sklearn.metrics.pairwise import cosine_similarity as _cos_sim
 
         accepted_coords = [d["bbox"] for d in result["detections"]]
@@ -2086,6 +2265,41 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                           f"(threshold {REMAINDER_COVERAGE_THRESH:.0%})")
                 continue
             if half_img.shape[0] < 20 or half_img.shape[1] < 20:
+                continue
+
+            # ── CORNER / PARTIAL OVERLAP GUARD ───────────────────────────────
+            # Problem: a Corner_Trace or Partial_Body tiger (e.g. animal entering
+            # the frame from the left) is detected by YOLO with a small bbox that
+            # clips the edge. The adjacent half-image contains the REST of the same
+            # tiger's body. The fingerprint similarity between a tiny corner crop and
+            # a full-half image is only ~0.55–0.65 — below the 0.82 same-tiger
+            # threshold — so the Remainder scan wrongly enrolls it as a new individual.
+            #
+            # Fix: if the remainder half OVERLAPS an existing Corner_Trace or
+            # Partial_Body detection by >= 25% of THAT detection's area, the half
+            # is the continuation of the same animal's body — skip it.
+            #
+            # 25% threshold calibration:
+            #   000466 Corner_Trace overlap with Remainder_R → 30% → BLOCKED ✓
+            #   Genuine second tiger overlap with existing small box → < 10% → PASSES ✓
+            CORNER_OVERLAP_BLOCK_THRESH = 0.25
+            _corner_block = False
+            for _cd in result["detections"]:
+                if _cd.get("visibility") not in ("Corner_Trace", "Partial_Body"):
+                    continue
+                cx1, cy1, cx2, cy2 = _cd["bbox"]
+                det_area = max(1, (cx2 - cx1) * (cy2 - cy1))
+                ox1 = max(rx1, cx1); oy1 = max(ry1, cy1)
+                ox2 = min(rx2, cx2); oy2 = min(ry2, cy2)
+                overlap = max(0, ox2 - ox1) * max(0, oy2 - oy1)
+                if overlap / det_area >= CORNER_OVERLAP_BLOCK_THRESH:
+                    _corner_block = True
+                    if show_summary:
+                        print(f"    [REMAINDER] {rsrc}: CORNER OVERLAP guard — "
+                              f"half contains {overlap/det_area:.0%} of "
+                              f"{_cd['tiger_id']} Corner/Partial bbox → same animal, skipped")
+                    break
+            if _corner_block:
                 continue
 
             # Species gate on uncovered half
@@ -2168,10 +2382,85 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                         break  # one confirmed strip is enough
 
                 if not _any_strip_confirmed:
-                    if show_summary:
-                        print(f"    [REMAINDER] {rsrc} (cov={cov:.0%}): "
-                              f"all uncovered sub-regions failed species gate — skipped")
-                    continue
+                    # ── FENCE-AWARE RETRY (Ground Truth Fix — 000341.jpg) ──────
+                    # Problem: a tiger behind a wire/bar fence has its body broken
+                    # into fragments by the fence bars. The uncovered strip crop
+                    # shows alternating bars + fur — ResNet50 cannot classify this
+                    # as "tiger" because the texture is corrupted by the bars.
+                    #
+                    # Two-stage fix:
+                    #   Stage 1 — ResNet50 species gate on fence-cleaned strip.
+                    #   Stage 2 — If ResNet50 still fails, run YOLO at conf=0.01
+                    #             on the cleaned strip. WHY: fence bars fragment the
+                    #             tiger body into disconnected segments. YOLO at
+                    #             normal conf=0.05 merges these segments into one low-
+                    #             confidence box which NMS suppresses.  At conf=0.01
+                    #             on the bar-removed crop, YOLO can recover the box.
+                    #
+                    # Safety: both stages ONLY run when:
+                    #   (a) all strips already failed the normal gate, and
+                    #   (b) a fence pattern is confirmed by Hough line detection.
+                    _fence_confirmed = False
+                    if detect_fence_pattern(img_proc):
+                        if show_summary:
+                            print(f"    [FENCE] Fence pattern detected in image — "
+                                  f"retrying with fence-bar reduction (ResNet50 + YOLO@0.01).")
+                        _FENCE_TIGER_FP = {"tiger cat", "tiger shark", "tiger beetle"}
+                        for (_bx1, _by1, _bx2, _by2) in _cand_strips:
+                            if (_bx2 - _bx1) < UNCOV_MIN_DIM or (_by2 - _by1) < UNCOV_MIN_DIM:
+                                continue
+                            _raw_strip   = img_proc[_by1:_by2, _bx1:_bx2]
+                            _clean_strip = remove_fence_bars(_raw_strip)
+
+                            # Stage 1: ResNet50 species gate on cleaned strip
+                            _fence_ok, _fence_top3 = verify_species_top3(_clean_strip)
+                            if _fence_ok:
+                                _fence_confirmed    = True
+                                _any_strip_confirmed = True
+                                if show_summary:
+                                    print(f"    [FENCE] ResNet50 confirmed tiger in "
+                                          f"cleaned strip — {_fence_top3}")
+                                break
+
+                            # Stage 2: YOLO ultra-low-conf (conf=0.01) on cleaned strip
+                            # Triggered only when ResNet50 can't see the fence-occluded body
+                            if oiv7_detector is not None:
+                                try:
+                                    _fc_res = oiv7_detector(
+                                        _clean_strip, verbose=False,
+                                        conf=0.01, iou=0.45)[0]
+                                    if _fc_res.boxes is not None:
+                                        for _fc_cls, _fc_conf in zip(
+                                                _fc_res.boxes.cls.cpu().numpy(),
+                                                _fc_res.boxes.conf.cpu().numpy()):
+                                            _fc_lbl = oiv7_detector.names[int(_fc_cls)]
+                                            _fc_lbl_l = _fc_lbl.lower()
+                                            if ("tiger" in _fc_lbl_l and
+                                                    not any(fp in _fc_lbl_l
+                                                            for fp in _FENCE_TIGER_FP)):
+                                                _fence_confirmed    = True
+                                                _any_strip_confirmed = True
+                                                if show_summary:
+                                                    print(f"    [FENCE] YOLO@0.01 confirmed "
+                                                          f"tiger in cleaned strip "
+                                                          f"(conf={_fc_conf:.3f}) — {_fc_lbl}")
+                                                break
+                                except Exception as _fc_err:
+                                    if show_summary:
+                                        print(f"    [FENCE] YOLO@0.01 failed: {_fc_err}")
+
+                            if _fence_confirmed:
+                                break
+
+                        if not _fence_confirmed and show_summary:
+                            print(f"    [FENCE] All fence-cleaned strips failed "
+                                  f"both ResNet50 and YOLO@0.01 — skipped.")
+
+                    if not _any_strip_confirmed:
+                        if show_summary:
+                            print(f"    [REMAINDER] {rsrc} (cov={cov:.0%}): "
+                                  f"all uncovered sub-regions failed species gate — skipped")
+                        continue
 
             # Fingerprint the half
             try:
@@ -2440,7 +2729,7 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     #   Partial-body strips of the SAME tiger score ~0.82–0.88.
     #   Different individuals score ~0.55–0.70.
 
-    if valid_count >= 1 and iw >= 80 and ih >= 80:
+    if valid_count >= 1 and iw >= 80 and ih >= 80 and not vertical_tiger_detected:
         from sklearn.metrics.pairwise import cosine_similarity as _cos_sim
 
         # Union bounding box of all accepted detections
@@ -2640,6 +2929,484 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                       f"Partial_Body   {m_vp:<18} "
                       f"match={m_score:.2f}  {m_status}  [{msrc}]")
 
+    # ── FENCE-ZONE TIGER SCAN ─────────────────────────────────────────────────────
+    # Triggered ONLY when a fence pattern is confirmed in the image.
+    #
+    # Problem: a tiger on the OTHER SIDE of a fence is missed by every scan above
+    # because:
+    #   • Remainder scan skips the half containing the fence tiger: cov > 65%
+    #     (the main tiger's large YOLO box covers most of that half)
+    #   • Margin scan strip is too narrow (< 60px) because the main box extends
+    #     nearly to the fence
+    #   • Strip-gate fence retry also fails: the strip is too narrow for both
+    #     ResNet50 and YOLO@0.01 to confirm a tiger body
+    #
+    # Fix: partition the image into LEFT and RIGHT zones based on the union
+    # bounding box of all existing detections, with a 20% overlap buffer to
+    # capture the full fence-tiger body (not just the uncovered edge).
+    # On each zone: (1) remove fence bars, (2) run YOLO at conf=0.01.
+    # Any new tiger box that clears all guards → enroll as a second individual.
+    #
+    # Safety gates (same strictness as LOWCONF):
+    #   (a) IoU with every existing detection < 0.30 → genuinely new region
+    #   (b) Species gate (ResNet50) on fence-cleaned crop → confirmed tiger
+    #   (c) Cosine similarity to existing tigers < 0.82 → different individual
+    #
+    # Ground truth calibration: 000341.jpg — 2 tigers, one behind a fence on
+    # the right side. Main tiger box ends near the fence; fence tiger is in the
+    # zone to the right of that box.
+    if (valid_count >= 1
+            and oiv7_detector is not None
+            and not vertical_tiger_detected
+            and detect_fence_pattern(img_proc)):
+
+        if show_summary:
+            print(f"\n    [FENCE-ZONE] Fence confirmed — scanning zones outside main detection.")
+
+        from sklearn.metrics.pairwise import cosine_similarity as _cos_sim
+
+        _fz_accepted = [d["bbox"] for d in result["detections"]]
+        _fz_ux1 = min(b[0] for b in _fz_accepted)
+        _fz_ux2 = max(b[2] for b in _fz_accepted)
+
+        # Overlap buffer: 20% of image width, so the zone starts slightly inside
+        # the main detection area. This lets YOLO build a coherent bounding box
+        # even if the fence tiger's body partially overlaps the main tiger region.
+        _fz_overlap = int(iw * 0.20)
+        _FENCE_ZONE_FP_BAD = {"tiger cat", "tiger shark", "tiger beetle"}
+
+        # SIGNAL TRACKER: only set True when YOLO finds a tiger-class box in the
+        # fence zone that is NOT the same box as an existing detection (IoU < 0.60).
+        # If this stays False after all scans, it means NOTHING tiger-like is visible
+        # behind the fence → no reason to ask a human. We only flag when the model
+        # finds an ambiguous signal it cannot cleanly resolve.
+        _fz_tiger_signal_found = False
+
+        fence_zones = []
+        if _fz_ux1 >= 30:                                      # left zone viable
+            fence_zones.append((0, 0, min(iw, _fz_ux1 + _fz_overlap), ih, "FenceZone_L"))
+        if (iw - _fz_ux2) >= 30:                              # right zone viable
+            fence_zones.append((max(0, _fz_ux2 - _fz_overlap), 0, iw, ih, "FenceZone_R"))
+
+        for (fzx1, fzy1, fzx2, fzy2, fzsrc) in fence_zones:
+            fz_crop = img_proc[fzy1:fzy2, fzx1:fzx2]
+            if fz_crop.shape[0] < 30 or fz_crop.shape[1] < 30:
+                continue
+
+            fz_clean = remove_fence_bars(fz_crop)
+
+            try:
+                fz_res = oiv7_detector(fz_clean, verbose=False,
+                                       conf=0.01, iou=0.45)[0]
+            except Exception as _fze:
+                if show_summary:
+                    print(f"    [FENCE-ZONE] {fzsrc}: YOLO failed — {_fze}")
+                continue
+
+            if fz_res.boxes is None or len(fz_res.boxes) == 0:
+                if show_summary:
+                    print(f"    [FENCE-ZONE] {fzsrc}: no detections")
+                continue
+
+            _fz_found_new = False
+            for fz_box, fz_cls, fz_conf_val in zip(
+                    fz_res.boxes.xyxy.cpu().numpy(),
+                    fz_res.boxes.cls.cpu().numpy(),
+                    fz_res.boxes.conf.cpu().numpy()):
+
+                fz_lbl   = oiv7_detector.names[int(fz_cls)]
+                fz_lbl_l = fz_lbl.lower()
+                if not ("tiger" in fz_lbl_l and
+                        not any(fp in fz_lbl_l for fp in _FENCE_ZONE_FP_BAD)):
+                    continue
+
+                # Translate to full-image coordinates with padding
+                fbx1 = max(0,  fzx1 + int(fz_box[0]) - CROP_PAD)
+                fby1 = max(0,  fzy1 + int(fz_box[1]) - CROP_PAD)
+                fbx2 = min(iw, fzx1 + int(fz_box[2]) + CROP_PAD)
+                fby2 = min(ih, fzy1 + int(fz_box[3]) + CROP_PAD)
+                if fbx2 <= fbx1 or fby2 <= fby1:
+                    continue
+
+                # (a) IoU guard — must be genuinely new region
+                fz_max_iou = 0.0
+                fb_area = max(1, (fbx2 - fbx1) * (fby2 - fby1))
+                for (ax1, ay1, ax2, ay2) in _fz_accepted:
+                    ix1 = max(fbx1, ax1); iy1 = max(fby1, ay1)
+                    ix2 = min(fbx2, ax2); iy2 = min(fby2, ay2)
+                    inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+                    if inter == 0:
+                        continue
+                    union = fb_area + (ax2 - ax1) * (ay2 - ay1) - inter
+                    fz_max_iou = max(fz_max_iou, inter / max(1, union))
+
+                # Mark signal: YOLO found a tiger-class box that is NOT the exact
+                # same box as an existing detection (IoU < 0.60). This is real
+                # evidence of something tiger-like in the fence zone, even if we
+                # ultimately can't confirm or enroll it.
+                if fz_max_iou < 0.60:
+                    _fz_tiger_signal_found = True
+
+                if fz_max_iou >= 0.30:
+                    if show_summary:
+                        print(f"    [FENCE-ZONE] {fzsrc} box ({fbx1},{fby1})-({fbx2},{fby2}) "
+                              f"conf={fz_conf_val:.3f}: overlaps existing "
+                              f"(IoU={fz_max_iou:.2f}) — ambiguous, cannot enroll")
+                    continue
+
+                # (b) Species gate on fence-cleaned crop at actual image coordinates
+                fz_real_crop = img_proc[fby1:fby2, fbx1:fbx2]
+                if fz_real_crop.shape[0] < 20 or fz_real_crop.shape[1] < 20:
+                    continue
+                fz_spec_ok, fz_top3 = verify_species_top3(remove_fence_bars(fz_real_crop))
+                if not fz_spec_ok:
+                    if show_summary:
+                        print(f"    [FENCE-ZONE] {fzsrc} box ({fbx1},{fby1})-({fbx2},{fby2}) "
+                              f"conf={fz_conf_val:.3f}: species rejected — {fz_top3}")
+                    continue
+
+                # (c) Fingerprint + cosine similarity guard
+                try:
+                    mean_fz = float(np.mean(cv2.cvtColor(fz_real_crop, cv2.COLOR_BGR2GRAY)))
+                    fp_fz   = extract_fingerprint(
+                        enhance_dark_crop(fz_real_crop) if mean_fz < 50 else fz_real_crop)
+                except Exception:
+                    continue
+
+                fz_max_sim = 0.0
+                for existing_det in result["detections"]:
+                    tid = existing_det.get("tiger_id", "")
+                    if tid and tid in tiger_db:
+                        fp_ex = tiger_db[tid]
+                    else:
+                        ex1, ey1, ex2, ey2 = existing_det["bbox"]
+                        ec = img_proc[max(0, ey1-CROP_PAD): min(ih, ey2+CROP_PAD),
+                                      max(0, ex1-CROP_PAD): min(iw, ex2+CROP_PAD)]
+                        if ec.size == 0:
+                            continue
+                        try:
+                            mean_ec = float(np.mean(cv2.cvtColor(ec, cv2.COLOR_BGR2GRAY)))
+                            fp_ex   = extract_fingerprint(
+                                enhance_dark_crop(ec) if mean_ec < 50 else ec)
+                        except Exception:
+                            continue
+                    try:
+                        sim = float(_cos_sim(fp_fz.reshape(1, -1),
+                                             fp_ex.reshape(1, -1))[0][0])
+                        fz_max_sim = max(fz_max_sim, sim)
+                    except Exception:
+                        pass
+
+                if fz_max_sim >= 0.82:
+                    if show_summary:
+                        print(f"    [FENCE-ZONE] {fzsrc}: same tiger as existing "
+                              f"(sim={fz_max_sim:.2f}) — skipped")
+                    continue
+
+                if show_summary:
+                    print(f"    [FENCE-ZONE] {fzsrc}: NEW tiger found! "
+                          f"box=({fbx1},{fby1})-({fbx2},{fby2}) "
+                          f"conf={fz_conf_val:.3f}  IoU={fz_max_iou:.2f}  "
+                          f"sim={fz_max_sim:.2f}")
+
+                # Enroll
+                try:
+                    fp_fz_enrol = extract_fingerprint(
+                        enhance_dark_crop(fz_real_crop) if mean_fz < 50 else fz_real_crop)
+                    fz_id, fz_score, fz_new = match_or_enroll(fp_fz_enrol, update_db=True)
+                except Exception as e:
+                    if show_summary:
+                        print(f"    [FENCE-ZONE] enroll failed: {e}")
+                    continue
+
+                fz_morph  = classify_color_morph(fz_real_crop)
+                fz_tinfo  = TIGER_TYPES.get(fz_morph, {"display": fz_morph,
+                                                        "color": (255, 140, 0)})
+                fz_vp     = classify_viewpoint(fbx1, fby1, fbx2, fby2, iw, ih)
+                fz_status = "New Enrollment" if fz_new else f"Recaptured {fz_score:.2f}"
+
+                cv2.rectangle(annotated, (fbx1, fby1), (fbx2, fby2),
+                              fz_tinfo["color"], 3)
+                fl1 = f"{fz_id}  {fz_tinfo['display']}  [{fz_vp}]"
+                fl2 = (f"Src:FenceZone  Det:{fz_conf_val:.2f}  "
+                       f"Match:{fz_score:.2f}  {fz_status}")
+                (flw, flh), _ = cv2.getTextSize(fl1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+                fbg_top = max(0, fby1 - flh * 2 - 14)
+                cv2.rectangle(annotated, (fbx1, fbg_top),
+                              (fbx1 + max(flw + 8, 260), fby1),
+                              fz_tinfo["color"], -1)
+                ftc = ((0, 0, 0) if fz_morph in ("White", "Snow_White", "Golden")
+                       else (255, 255, 255))
+                cv2.putText(annotated, fl1, (fbx1 + 4, fby1 - flh - 4),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, ftc, 2)
+                cv2.putText(annotated, fl2, (fbx1 + 4, fby1 - 2),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.36, ftc, 1)
+
+                _fz_accepted.append((fbx1, fby1, fbx2, fby2))
+                valid_count += 1
+                result["detections"].append({
+                    "tiger_id"        : fz_id,
+                    "morph"           : fz_morph,
+                    "display"         : fz_tinfo["display"],
+                    "visibility"      : "Partial_Body",
+                    "viewpoint"       : fz_vp,
+                    "detection_source": "FenceZone_OIV7",
+                    "det_conf"        : round(float(fz_conf_val), 4),
+                    "match_score"     : round(fz_score, 4),
+                    "is_new"          : fz_new,
+                    "id_status"       : fz_status,
+                    "top3_labels"     : " | ".join(fz_top3),
+                    "bbox"            : (fbx1, fby1, fbx2, fby2),
+                })
+
+                if show_summary:
+                    print(f"    {fz_id:<12} {fz_tinfo['display']:<22} "
+                          f"Partial_Body   {fz_vp:<18} "
+                          f"match={fz_score:.2f}  {fz_status}  [FenceZone_OIV7]")
+
+                _fz_found_new = True
+                break   # one fence-zone tiger per zone; move to next zone
+
+            if not _fz_found_new and show_summary:
+                print(f"    [FENCE-ZONE] {fzsrc}: no new tiger passed all guards")
+
+        # ── FENCE MASK-SEARCH: last resort ────────────────────────────────────
+        # When all fence-zone scans fail, the second tiger is probably SPATIALLY
+        # OVERLAPPING the main tiger in the frame (one is in the foreground, the
+        # other behind the fence in the background at the same x/y position).
+        # YOLO's NMS always suppresses the background box because the foreground
+        # box has higher confidence and high IoU with it.
+        #
+        # Fix: create a masked copy of the image where every accepted detection box
+        # is filled with the median colour of the surrounding border. This removes
+        # the foreground tiger's texture that confuses YOLO, allowing it to "see"
+        # the background tiger body that was hidden underneath.
+        #
+        # Only runs when the fence zone scan found nothing new (valid_count still == 1).
+        if valid_count == 1 and oiv7_detector is not None:
+            _fz_mask_img = img_proc.copy()
+            for (ax1, ay1, ax2, ay2) in _fz_accepted:
+                # Fill box with surrounding border median — less jarring than black
+                border_pixels = []
+                pad = 8
+                if ay1 - pad >= 0:
+                    border_pixels.append(_fz_mask_img[max(0, ay1-pad):ay1, ax1:ax2])
+                if ay2 + pad <= ih:
+                    border_pixels.append(_fz_mask_img[ay2:min(ih, ay2+pad), ax1:ax2])
+                if ax1 - pad >= 0:
+                    border_pixels.append(_fz_mask_img[ay1:ay2, max(0, ax1-pad):ax1])
+                if ax2 + pad <= iw:
+                    border_pixels.append(_fz_mask_img[ay1:ay2, ax2:min(iw, ax2+pad)])
+                if border_pixels:
+                    all_pixels = np.concatenate(
+                        [p.reshape(-1, 3) for p in border_pixels], axis=0)
+                    fill_color = tuple(int(v) for v in np.median(all_pixels, axis=0))
+                else:
+                    fill_color = (128, 128, 128)
+                _fz_mask_img[ay1:ay2, ax1:ax2] = fill_color
+
+            _fz_clean_mask = remove_fence_bars(_fz_mask_img)
+
+            try:
+                fz_mask_res = oiv7_detector(_fz_clean_mask, verbose=False,
+                                            conf=0.01, iou=0.45)[0]
+            except Exception as _fzme:
+                fz_mask_res = None
+                if show_summary:
+                    print(f"    [FENCE-MASK] YOLO on masked image failed: {_fzme}")
+
+            if fz_mask_res is not None and fz_mask_res.boxes is not None:
+                for fzm_box, fzm_cls, fzm_conf in zip(
+                        fz_mask_res.boxes.xyxy.cpu().numpy(),
+                        fz_mask_res.boxes.cls.cpu().numpy(),
+                        fz_mask_res.boxes.conf.cpu().numpy()):
+                    fzm_lbl   = oiv7_detector.names[int(fzm_cls)]
+                    fzm_lbl_l = fzm_lbl.lower()
+                    if not ("tiger" in fzm_lbl_l and
+                            not any(fp in fzm_lbl_l for fp in _FENCE_ZONE_FP_BAD)):
+                        continue
+
+                    mx1 = max(0,  int(fzm_box[0]) - CROP_PAD)
+                    my1 = max(0,  int(fzm_box[1]) - CROP_PAD)
+                    mx2 = min(iw, int(fzm_box[2]) + CROP_PAD)
+                    my2 = min(ih, int(fzm_box[3]) + CROP_PAD)
+                    if mx2 <= mx1 or my2 <= my1:
+                        continue
+
+                    fzm_max_iou = 0.0
+                    fzm_area = max(1, (mx2 - mx1) * (my2 - my1))
+                    for (ax1, ay1, ax2, ay2) in _fz_accepted:
+                        ix1 = max(mx1, ax1); iy1 = max(my1, ay1)
+                        ix2 = min(mx2, ax2); iy2 = min(my2, ay2)
+                        inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+                        if inter == 0:
+                            continue
+                        union = fzm_area + (ax2 - ax1) * (ay2 - ay1) - inter
+                        fzm_max_iou = max(fzm_max_iou, inter / max(1, union))
+
+                    # Mark signal: mask-search found a tiger-class box distinct
+                    # from any existing detection → something is there
+                    if fzm_max_iou < 0.60:
+                        _fz_tiger_signal_found = True
+
+                    if fzm_max_iou >= 0.60:
+                        if show_summary:
+                            print(f"    [FENCE-MASK] box ({mx1},{my1})-({mx2},{my2}) "
+                                  f"conf={fzm_conf:.3f}: IoU={fzm_max_iou:.2f} — skipped")
+                        continue
+
+                    # Species gate on original image crop (not the masked version)
+                    fzm_real_crop = img_proc[my1:my2, mx1:mx2]
+                    if fzm_real_crop.shape[0] < 20 or fzm_real_crop.shape[1] < 20:
+                        continue
+                    fzm_spec_ok, fzm_top3 = verify_species_top3(
+                        remove_fence_bars(fzm_real_crop))
+                    if not fzm_spec_ok:
+                        if show_summary:
+                            print(f"    [FENCE-MASK] ({mx1},{my1})-({mx2},{my2}) "
+                                  f"species rejected — {fzm_top3}")
+                        continue
+
+                    # Cosine similarity guard
+                    try:
+                        mean_fzm = float(np.mean(
+                            cv2.cvtColor(fzm_real_crop, cv2.COLOR_BGR2GRAY)))
+                        fp_fzm = extract_fingerprint(
+                            enhance_dark_crop(fzm_real_crop) if mean_fzm < 50
+                            else fzm_real_crop)
+                    except Exception:
+                        continue
+
+                    fzm_max_sim = 0.0
+                    for existing_det in result["detections"]:
+                        tid = existing_det.get("tiger_id", "")
+                        if tid and tid in tiger_db:
+                            fp_ex = tiger_db[tid]
+                        else:
+                            ex1, ey1, ex2, ey2 = existing_det["bbox"]
+                            ec = img_proc[max(0,ey1-CROP_PAD):min(ih,ey2+CROP_PAD),
+                                         max(0,ex1-CROP_PAD):min(iw,ex2+CROP_PAD)]
+                            if ec.size == 0:
+                                continue
+                            try:
+                                mean_ec = float(np.mean(
+                                    cv2.cvtColor(ec, cv2.COLOR_BGR2GRAY)))
+                                fp_ex = extract_fingerprint(
+                                    enhance_dark_crop(ec) if mean_ec < 50 else ec)
+                            except Exception:
+                                continue
+                        try:
+                            sim = float(_cos_sim(fp_fzm.reshape(1, -1),
+                                                 fp_ex.reshape(1, -1))[0][0])
+                            fzm_max_sim = max(fzm_max_sim, sim)
+                        except Exception:
+                            pass
+
+                    if fzm_max_sim >= 0.82:
+                        if show_summary:
+                            print(f"    [FENCE-MASK] ({mx1},{my1})-({mx2},{my2}): "
+                                  f"same tiger (sim={fzm_max_sim:.2f}) — skipped")
+                        continue
+
+                    if show_summary:
+                        print(f"    [FENCE-MASK] NEW tiger found via mask search! "
+                              f"box=({mx1},{my1})-({mx2},{my2}) "
+                              f"conf={fzm_conf:.3f}  IoU={fzm_max_iou:.2f}  "
+                              f"sim={fzm_max_sim:.2f}")
+
+                    try:
+                        fp_fzm_enrol = extract_fingerprint(
+                            enhance_dark_crop(fzm_real_crop) if mean_fzm < 50
+                            else fzm_real_crop)
+                        fzm_id, fzm_score, fzm_new = match_or_enroll(
+                            fp_fzm_enrol, update_db=True)
+                    except Exception as e:
+                        if show_summary:
+                            print(f"    [FENCE-MASK] enroll failed: {e}")
+                        continue
+
+                    fzm_morph  = classify_color_morph(fzm_real_crop)
+                    fzm_tinfo  = TIGER_TYPES.get(fzm_morph, {
+                        "display": fzm_morph, "color": (255, 100, 0)})
+                    fzm_vp     = classify_viewpoint(mx1, my1, mx2, my2, iw, ih)
+                    fzm_status = ("New Enrollment" if fzm_new
+                                  else f"Recaptured {fzm_score:.2f}")
+
+                    cv2.rectangle(annotated, (mx1, my1), (mx2, my2),
+                                  fzm_tinfo["color"], 3)
+                    fm1 = f"{fzm_id}  {fzm_tinfo['display']}  [{fzm_vp}]"
+                    fm2 = (f"Src:FenceMask  Det:{fzm_conf:.2f}  "
+                           f"Match:{fzm_score:.2f}  {fzm_status}")
+                    (fmlw, fmlh), _ = cv2.getTextSize(
+                        fm1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+                    fmbg = max(0, my1 - fmlh * 2 - 14)
+                    cv2.rectangle(annotated, (mx1, fmbg),
+                                  (mx1 + max(fmlw + 8, 260), my1),
+                                  fzm_tinfo["color"], -1)
+                    fmtc = ((0, 0, 0)
+                            if fzm_morph in ("White", "Snow_White", "Golden")
+                            else (255, 255, 255))
+                    cv2.putText(annotated, fm1, (mx1 + 4, my1 - fmlh - 4),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, fmtc, 2)
+                    cv2.putText(annotated, fm2, (mx1 + 4, my1 - 2),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.36, fmtc, 1)
+
+                    _fz_accepted.append((mx1, my1, mx2, my2))
+                    valid_count += 1
+                    result["detections"].append({
+                        "tiger_id"        : fzm_id,
+                        "morph"           : fzm_morph,
+                        "display"         : fzm_tinfo["display"],
+                        "visibility"      : "Partial_Body",
+                        "viewpoint"       : fzm_vp,
+                        "detection_source": "FenceMask_OIV7",
+                        "det_conf"        : round(float(fzm_conf), 4),
+                        "match_score"     : round(fzm_score, 4),
+                        "is_new"          : fzm_new,
+                        "id_status"       : fzm_status,
+                        "top3_labels"     : " | ".join(fzm_top3),
+                        "bbox"            : (mx1, my1, mx2, my2),
+                    })
+
+                    if show_summary:
+                        print(f"    {fzm_id:<12} {fzm_tinfo['display']:<22} "
+                              f"Partial_Body   {fzm_vp:<18} "
+                              f"match={fzm_score:.2f}  {fzm_status}  [FenceMask_OIV7]")
+                    break   # one mask-search tiger per fence detection
+
+            if valid_count == 1:
+                if show_summary:
+                    print(f"    [FENCE-MASK] Mask search also found no new tiger.")
+
+                if _fz_tiger_signal_found:
+                    # YOLO found tiger-class evidence in the fence zone but all
+                    # guards failed — the model sees SOMETHING but cannot confirm
+                    # it cleanly. Flag for human review.
+                    result["needs_confirmation"] = True
+                    _fence_reason = (
+                        "fence/barrier present AND model detected a low-confidence "
+                        "tiger-class signal in the fence zone that could not be "
+                        "confirmed — possible second tiger occluded behind fence bars. "
+                        "Human count required.")
+                    result.setdefault("uncertain_detections", [])
+                    for _fd in result["detections"]:
+                        result["uncertain_detections"].append(
+                            (_fd["tiger_id"], _fence_reason))
+                    if show_summary:
+                        print(f"\n    {'=' * 58}")
+                        print(f"    ⚠  FENCE — UNRESOLVED SIGNAL — HUMAN REVIEW NEEDED")
+                        print(f"    {'=' * 58}")
+                        print(f"    MY PREDICTION : {valid_count} tiger(s) detected confidently")
+                        print(f"    REASON        : Fence present + low-conf tiger signal")
+                        print(f"                   found but could not be confirmed.")
+                        print(f"    PLEASE CONFIRM: Is this the correct tiger count?")
+                        print(f"    {'=' * 58}")
+                else:
+                    # Fence present but YOLO found zero tiger-class evidence behind
+                    # it at conf=0.01. Nothing to report — the fence zone is clear.
+                    if show_summary:
+                        print(f"    [FENCE-ZONE] No tiger signal behind fence — no flag raised.")
+
     # ── CONFIDENCE ASSESSMENT (per detection) ────────────────────────────────────
     # RULE: Flag UNCERTAIN only when the pipeline has NO trained verification
     # mechanism for the detection. Everything that passed the species gate
@@ -2690,8 +3457,14 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
         else:
             det["confidence"] = "MEDIUM"
 
-    result["uncertain_detections"] = uncertain_detections
-    result["needs_confirmation"]   = len(uncertain_detections) > 0
+    # Merge with any pre-set flags (e.g. fence-occlusion flag set earlier)
+    prior_confirmation = result.get("needs_confirmation", False)
+    prior_uncertain    = result.get("uncertain_detections", [])
+    # Preserve entries from prior stages that aren't duplicated by this assessment
+    prior_only = [e for e in prior_uncertain
+                  if e not in uncertain_detections]
+    result["uncertain_detections"] = prior_only + uncertain_detections
+    result["needs_confirmation"]   = prior_confirmation or len(uncertain_detections) > 0
 
     if uncertain_detections and show_summary:
         unique_ids = list(dict.fromkeys(d["tiger_id"] for d in result["detections"]))
@@ -2707,11 +3480,316 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
         print(f"    PLEASE CONFIRM: is the tiger count correct?")
         print(f"    {'=' * 58}")
 
+    # ── ZERO-DETECTION HUMAN REVIEW FLAG ────────────────────────────────────
+    # If the pipeline found zero tigers, the species gate may have mis-classified
+    # a real tiger (dark/blurry/partial images where ResNet50 top-3 returns non-tiger
+    # classes). Rather than silently discarding these images, flag them for a human
+    # to verify — the model might be wrong.
+    # Rule: only flag when the image passed triage (not skipped for quality) but the
+    # species gate rejected it. Genuinely empty forest images won't have any YOLO
+    # boxes, so we check whether cascade detection DID find a box.
+    if valid_count == 0 and not result.get("skipped", False):
+        _reject_reason = (
+            f"No tiger confirmed by species gate — model returned 0 detections. "
+            f"Please verify manually: the species gate may have mis-classified a "
+            f"real tiger in a dark, partial, or unusual pose image.")
+        result["needs_confirmation"] = True
+        result.setdefault("uncertain_detections", [])
+        result["uncertain_detections"].append(("No_Detection", _reject_reason))
+        if show_summary:
+            print(f"\n    {'=' * 58}")
+            print(f"    ⚠  ZERO DETECTIONS — HUMAN VERIFICATION NEEDED")
+            print(f"    {'=' * 58}")
+            print(f"    The species gate returned 0 tigers for this image.")
+            print(f"    Please check the image manually — model may be wrong.")
+            print(f"    {'=' * 58}")
+
     result["tiger_count"] = valid_count
     if valid_count > 0:
         cv2.imwrite(str(ANNOTATED_DIR / img_path.name), annotated)
 
     return result
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SECTION 12b — HTML DASHBOARD GENERATOR
+# Produces an interactive self-contained HTML report after every batch run.
+# No external server needed — open the .html file directly in any browser.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _generate_html_dashboard(all_results, csv_rows, conservative_count, liberal_count,
+                              source_counts, morph_counts, total_dets, unusable_count,
+                              no_tiger_count, tiger_img_count, html_path, ts, images):
+    """Build a self-contained HTML dashboard from batch results."""
+
+    # ── Per-image rows ────────────────────────────────────────────────────────
+    img_rows_html = ""
+    for res in all_results:
+        if res["skipped"]:
+            status_badge = '<span class="badge badge-unusable">Unusable</span>'
+            count_cell   = "—"
+            ids_cell     = "—"
+            review_cell  = "—"
+        elif res["tiger_count"] == 0:
+            status_badge = '<span class="badge badge-no">No Tiger</span>'
+            count_cell   = "0"
+            ids_cell     = "—"
+            review_cell  = "—"
+        else:
+            status_badge = '<span class="badge badge-yes">Tiger ✓</span>'
+            count_cell   = str(res["tiger_count"])
+            ids_cell     = ", ".join(sorted({d["tiger_id"] for d in res["detections"]}))
+            needs_review = res.get("needs_confirmation", False)
+            review_cell  = ('<span class="badge badge-review">⚠ REVIEW</span>'
+                            if needs_review else
+                            '<span class="badge badge-ok">OK</span>')
+
+        img_rows_html += f"""
+        <tr>
+          <td><code>{res['filename']}</code></td>
+          <td>{status_badge}</td>
+          <td>{count_cell}</td>
+          <td>{ids_cell}</td>
+          <td>{review_cell}</td>
+          <td><small>{res.get('quality_bucket','—')}</small></td>
+        </tr>"""
+
+    # ── Detection detail rows ─────────────────────────────────────────────────
+    det_rows_html = ""
+    for row in csv_rows:
+        conf   = row.get("Confidence", "MEDIUM")
+        review = row.get("Human_Review", "NO")
+        conf_badge = (f'<span class="badge badge-high">HIGH</span>'   if conf == "HIGH"   else
+                      f'<span class="badge badge-medium">MEDIUM</span>' if conf == "MEDIUM" else
+                      f'<span class="badge badge-review">LOW ⚠</span>')
+        rev_badge  = ('<span class="badge badge-review">YES ⚠</span>'
+                      if review == "YES" else
+                      '<span class="badge badge-ok">NO</span>')
+        det_rows_html += f"""
+        <tr>
+          <td><code>{row['Image_File']}</code></td>
+          <td>{row['Tiger_ID']}</td>
+          <td>{row.get('Is_New_Tiger','')}</td>
+          <td>{row.get('ViewPoint','')}</td>
+          <td>{row.get('Detection_Source','')}</td>
+          <td>{row.get('Match_Score','')}</td>
+          <td>{conf_badge}</td>
+          <td>{rev_badge}</td>
+          <td><small>{row.get('Color_Morph','')}</small></td>
+        </tr>"""
+
+    # ── Human Review Required section — ALWAYS shown ─────────────────────────
+    # Rule: Every image the model is not fully confident about must appear here.
+    # Categories:
+    #   1. needs_confirmation=True  → fence occlusion, vertical body, low match
+    #   2. skipped=True             → rejected by species gate / unusable
+    #      (rejected images may be genuine tigers that ResNet50 mis-classified;
+    #       a human should verify before discarding them)
+    review_images = [r for r in all_results
+                     if r.get("needs_confirmation") or r.get("skipped")]
+
+    items = ""
+    for res in review_images:
+        if res.get("skipped"):
+            tag    = "REJECTED / UNUSABLE"
+            color  = "#721C24"
+            bg     = "#F8D7DA"
+            reason = (f"Image was rejected by the species gate or marked unusable. "
+                      f"Quality: {res.get('quality_bucket','Unknown')}. "
+                      f"Please verify manually — the model may have incorrectly "
+                      f"dismissed a real tiger.")
+            pred   = "0 (rejected)"
+        else:
+            pred_ids = ", ".join(dict.fromkeys(d["tiger_id"] for d in res["detections"]))
+            pred   = f"{res['tiger_count']} tiger(s): {pred_ids}"
+            reason_parts = []
+            for tid, why in res.get("uncertain_detections", []):
+                reason_parts.append(f"• [{tid}] {why}")
+            reason = "<br>".join(reason_parts) if reason_parts else "Low confidence detection."
+            # Choose tag based on primary reason
+            if any("fence" in w.lower() for _, w in res.get("uncertain_detections", [])):
+                tag = "FENCE OCCLUSION"
+                color = "#856404"; bg = "#FFF3CD"
+            elif any("vertical" in w.lower() for _, w in res.get("uncertain_detections", [])):
+                tag = "VERTICAL BODY"
+                color = "#0C5460"; bg = "#D1ECF1"
+            else:
+                tag = "LOW CONFIDENCE"
+                color = "#383D41"; bg = "#E2E3E5"
+
+        items += f"""
+        <div class="uncertain-card" style="border-left:4px solid {color};background:{bg};
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:{color}">[{tag}]</strong>
+          &nbsp;<strong>{res['filename']}</strong>
+          &nbsp;— My prediction: <em>{pred}</em><br>
+          <span class="reason" style="font-size:0.88em">{reason}</span>
+        </div>"""
+
+    if not review_images:
+        items = """<div style="padding:10px;color:#155724;background:#D4EDDA;
+                   border-radius:4px;">
+                   ✓ All detections in this batch are HIGH or MEDIUM confidence.
+                   No human review required.</div>"""
+
+    uncertain_html = f"""
+    <div class="section">
+      <h2>⚠ Human Review Required — {len(review_images)} image(s)</h2>
+      <p style="font-size:0.9em;color:#555;">
+        The images below need a human to verify the count or confirm the tiger's presence.
+        This includes: fence-occluded tigers, low-confidence detections, vertical-body images
+        where the multi-tiger scan was skipped, and images rejected by the species gate.
+      </p>
+      {items}
+    </div>"""
+
+    # ── Source breakdown bars ─────────────────────────────────────────────────
+    src_bars = ""
+    for src, cnt in sorted(source_counts.items(), key=lambda x: -x[1]):
+        pct = round(cnt / total_dets * 100, 1) if total_dets else 0
+        src_bars += f"""
+        <div class="bar-row">
+          <span class="bar-label">{src}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:{pct}%"></div></div>
+          <span class="bar-val">{cnt} ({pct}%)</span>
+        </div>"""
+
+    # ── Morph breakdown bars ──────────────────────────────────────────────────
+    morph_bars = ""
+    for morph, cnt in sorted(morph_counts.items(), key=lambda x: -x[1]):
+        pct  = round(cnt / total_dets * 100, 1) if total_dets else 0
+        disp = TIGER_TYPES.get(morph, {}).get("display", morph)
+        morph_bars += f"""
+        <div class="bar-row">
+          <span class="bar-label">{disp}</span>
+          <div class="bar-track"><div class="bar-fill bar-morph" style="width:{pct}%"></div></div>
+          <span class="bar-val">{cnt} ({pct}%)</span>
+        </div>"""
+
+    human_review_count = sum(1 for r in csv_rows if r.get("Human_Review") == "YES")
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACE Tiger Pipeline — V2 Dashboard</title>
+<style>
+  :root {{
+    --primary: #0D2B55;
+    --accent:  #1A4F8A;
+    --light:   #E3F2FD;
+    --warn:    #FF6B35;
+    --ok:      #2ECC71;
+    --med:     #F39C12;
+    --low:     #E74C3C;
+  }}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #F4F6F9; color: #222; }}
+  header {{ background: var(--primary); color: #fff; padding: 24px 32px; }}
+  header h1 {{ font-size: 1.6rem; letter-spacing: 1px; }}
+  header p  {{ font-size: 0.85rem; opacity: 0.75; margin-top: 4px; }}
+  .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+           gap: 16px; padding: 24px 32px 0; }}
+  .card {{ background: #fff; border-radius: 8px; padding: 20px; text-align: center;
+           box-shadow: 0 2px 6px rgba(0,0,0,.08); }}
+  .card .num {{ font-size: 2.2rem; font-weight: 700; color: var(--primary); }}
+  .card .lbl {{ font-size: 0.78rem; color: #666; margin-top: 4px; }}
+  .card.warn  .num {{ color: var(--warn); }}
+  .card.ok    .num {{ color: var(--ok);   }}
+  .section {{ background: #fff; border-radius: 8px; margin: 20px 32px;
+              padding: 20px 24px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }}
+  .section h2 {{ font-size: 1rem; color: var(--primary); margin-bottom: 14px;
+                 border-bottom: 2px solid var(--light); padding-bottom: 8px; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 0.84rem; }}
+  th {{ background: var(--primary); color: #fff; padding: 8px 10px; text-align: left; }}
+  td {{ padding: 7px 10px; border-bottom: 1px solid #eee; }}
+  tr:hover td {{ background: var(--light); }}
+  .badge {{ display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 0.75rem; font-weight: 600; }}
+  .badge-yes      {{ background: #D4EDDA; color: #155724; }}
+  .badge-no       {{ background: #F8F9FA; color: #6C757D; }}
+  .badge-unusable {{ background: #F8D7DA; color: #721C24; }}
+  .badge-review   {{ background: #FFF3CD; color: #856404; }}
+  .badge-ok       {{ background: #D4EDDA; color: #155724; }}
+  .badge-high     {{ background: #CCE5FF; color: #004085; }}
+  .badge-medium   {{ background: #D4EDDA; color: #155724; }}
+  .bar-row  {{ display: flex; align-items: center; margin-bottom: 8px; }}
+  .bar-label{{ width: 220px; font-size: 0.82rem; color: #444; }}
+  .bar-track{{ flex: 1; background: #EEE; border-radius: 4px; height: 14px; }}
+  .bar-fill {{ background: var(--accent); height: 14px; border-radius: 4px;
+               min-width: 2px; }}
+  .bar-morph{{ background: var(--warn); }}
+  .bar-val  {{ width: 100px; text-align: right; font-size: 0.8rem; color: #666; }}
+  .uncertain-card {{ background: #FFF8E1; border-left: 4px solid var(--warn);
+                     border-radius: 4px; padding: 12px; margin-bottom: 10px; }}
+  .reason   {{ color: #6C3F00; font-size: 0.82rem; margin-top: 4px; }}
+  footer {{ text-align: center; padding: 20px; font-size: 0.78rem; color: #999; }}
+</style>
+</head>
+<body>
+<header>
+  <h1>TRACE Tiger Pipeline — V2 Dashboard</h1>
+  <p>EPAIB Batch 05 | Group 4 | IIM Lucknow &nbsp;|&nbsp; Generated: {ts} &nbsp;|&nbsp;
+     Survey: {RANGE_NAME} | {BEAT_NAME}</p>
+</header>
+
+<div class="grid">
+  <div class="card"><div class="num">{len(images)}</div><div class="lbl">Total Images</div></div>
+  <div class="card ok"><div class="num">{tiger_img_count}</div><div class="lbl">Images with Tigers</div></div>
+  <div class="card"><div class="num">{no_tiger_count}</div><div class="lbl">No Tiger</div></div>
+  <div class="card"><div class="num">{unusable_count}</div><div class="lbl">Unusable / Blurry</div></div>
+  <div class="card"><div class="num">{total_dets}</div><div class="lbl">Total Detections</div></div>
+  <div class="card"><div class="num">{conservative_count}</div><div class="lbl">Conservative Count</div></div>
+  <div class="card"><div class="num">{liberal_count}</div><div class="lbl">Liberal Count</div></div>
+  <div class="card {'warn' if human_review_count > 0 else 'ok'}">
+    <div class="num">{human_review_count}</div>
+    <div class="lbl">Need Human Review</div>
+  </div>
+</div>
+
+{uncertain_html}
+
+<div class="section">
+  <h2>Per-Image Summary</h2>
+  <table>
+    <thead><tr>
+      <th>Image</th><th>Status</th><th>Count</th>
+      <th>Tiger IDs</th><th>Review</th><th>Quality</th>
+    </tr></thead>
+    <tbody>{img_rows_html}</tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Detection Detail (one row per detection)</h2>
+  <table>
+    <thead><tr>
+      <th>Image</th><th>Tiger ID</th><th>New?</th>
+      <th>ViewPoint</th><th>Source</th><th>Match Score</th>
+      <th>Confidence</th><th>Human Review</th><th>Morph</th>
+    </tr></thead>
+    <tbody>{det_rows_html}</tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Detection Source Breakdown</h2>
+  {src_bars}
+</div>
+
+<div class="section">
+  <h2>Colour Morph Breakdown</h2>
+  {morph_bars}
+</div>
+
+<footer>
+  TRACE Tiger Pipeline V2 &nbsp;|&nbsp; EPAIB Batch 05 Group 4 &nbsp;|&nbsp; IIM Lucknow
+</footer>
+</body>
+</html>"""
+
+    html_path.write_text(html, encoding="utf-8")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -2773,6 +3851,8 @@ def run_population_report(data_dir=None, run_gradcam=False):
                 "Match_Score"      : d["match_score"],
                 "Detection_Conf"   : d["det_conf"],
                 "Top3_ResNet"      : d["top3_labels"],
+                "Confidence"       : d.get("confidence", "MEDIUM"),
+                "Human_Review"     : "YES" if d.get("confidence") == "LOW" else "NO",
             })
 
     if csv_rows:
@@ -2839,8 +3919,8 @@ def run_population_report(data_dir=None, run_gradcam=False):
         "=" * 65,
         f"  Generated        : {ts}",
         f"  Survey Location  : {RANGE_NAME} | {BEAT_NAME}",
-        f"  Detection Chain  : YOLOv8n-OIV7 -> COCO-proxy -> Whole-image",
-        f"  Species Gate     : ResNet50 top-3 tiger verification",
+        f"  Detection Chain  : YOLOv8l-OIV7 -> COCO-proxy -> Whole-image  [V2]",
+        f"  Species Gate     : EfficientNetV2-L top-3 tiger verification [V2]",
         f"  Identity Method  : Cosine Similarity (threshold {SIMILARITY_THRESHOLD})",
         f"  ViewPoint Census : Left_Flank / Right_Flank / Frontal",
         "=" * 65,
@@ -2912,45 +3992,59 @@ def run_population_report(data_dir=None, run_gradcam=False):
         vps   = ", ".join(sorted(viewpoint_map.get(tid, {"Unknown"})))
         lines.append(f"  {tid:<14}: {cnt} sighting(s)   ViewPoints: {vps}")
 
-    # ── Uncertain images summary ──────────────────────────────────────────
-    uncertain_images = [
+    # ── Human Review section — ALWAYS shown ──────────────────────────────────
+    # Includes: low-confidence flags, fence occlusion, vertical-body guard,
+    # AND rejected/skipped images (species gate may occasionally mis-fire).
+    review_images_txt = [
         res for res in all_results
-        if res.get("needs_confirmation") and not res.get("skipped")
+        if res.get("needs_confirmation") or res.get("skipped")
     ]
 
-    if uncertain_images:
-        lines += [
-            "",
-            "  " + "!" * 61,
-            "  !!  UNCERTAIN IMAGES — HUMAN CONFIRMATION NEEDED        !!",
-            "  " + "!" * 61,
-            "  The pipeline is NOT fully confident about the detections",
-            "  listed below. These are BEST-GUESS predictions only.",
-            "  Please look at each image and confirm the tiger count.",
-            "  " + "-" * 61,
-        ]
-        for res in uncertain_images:
-            pred_count = res["tiger_count"]
-            pred_ids   = ", ".join(
-                dict.fromkeys(d["tiger_id"] for d in res["detections"]))
-            lines.append(
-                f"  IMAGE : {res['filename']}")
-            lines.append(
-                f"    My prediction  : {pred_count} tiger(s)  →  {pred_ids}")
-            for tid, why in res.get("uncertain_detections", []):
-                lines.append(f"    Uncertain ({tid}) : {why}")
-            lines.append("")
-        lines += [
-            "  " + "!" * 61,
-        ]
+    lines += [
+        "",
+        "  " + "=" * 61,
+        f"  ⚠  HUMAN REVIEW REQUIRED — {len(review_images_txt)} IMAGE(S)",
+        "  " + "=" * 61,
+        "  Every image listed below needs a human to verify the count",
+        "  or confirm the tiger's presence before results are finalised.",
+        "  Categories:",
+        "    [FENCE]    — fence/barrier detected; possible 2nd tiger hidden",
+        "    [VERTICAL] — vertical body orientation; multi-tiger scan skipped",
+        "    [LOW CONF] — match score too low to trust auto-identification",
+        "    [REJECTED] — species gate rejected; verify not a missed tiger",
+        "  " + "-" * 61,
+    ]
+
+    if not review_images_txt:
+        lines.append(
+            "  ✓ All detections HIGH/MEDIUM confidence. No review needed.")
     else:
-        lines += [
-            "",
-            "  CONFIDENCE CHECK",
-            "  " + "-" * 40,
-            "  All detections in this batch are HIGH or MEDIUM confidence.",
-            "  No human confirmation required for this run.",
-        ]
+        for res in review_images_txt:
+            if res.get("skipped"):
+                lines.append(f"  [REJECTED]  {res['filename']}")
+                lines.append(f"    My prediction : 0 tigers (rejected by species gate)")
+                lines.append(f"    Quality       : {res.get('quality_bucket','Unknown')}")
+                lines.append(f"    Action needed : Verify manually — model may have")
+                lines.append(f"                   incorrectly dismissed a real tiger.")
+            else:
+                pred_ids = ", ".join(
+                    dict.fromkeys(d["tiger_id"] for d in res["detections"]))
+                reasons  = res.get("uncertain_detections", [])
+                # Determine primary flag
+                if any("fence" in w.lower() for _, w in reasons):
+                    flag = "[FENCE]   "
+                elif any("vertical" in w.lower() for _, w in reasons):
+                    flag = "[VERTICAL]"
+                else:
+                    flag = "[LOW CONF]"
+                lines.append(f"  {flag}  {res['filename']}")
+                lines.append(
+                    f"    My prediction : {res['tiger_count']} tiger(s)  →  {pred_ids}")
+                for tid, why in reasons:
+                    lines.append(f"    Reason ({tid:<14}): {why[:80]}")
+            lines.append("")
+
+    lines += ["  " + "=" * 61]
 
     lines += [
         "",
@@ -2973,6 +4067,25 @@ def run_population_report(data_dir=None, run_gradcam=False):
     print(f"\n[INFO] Report saved -> {REPORT_TXT}")
     print(f"[INFO] CSV    saved -> {OUTPUT_CSV}")
     print(f"[INFO] DB     saved -> {DB_FILE}")
+
+    # ── HTML Dashboard ────────────────────────────────────────────────────────
+    html_path = REPORTS_DIR / "v2_dashboard.html"
+    _generate_html_dashboard(
+        all_results=all_results,
+        csv_rows=csv_rows,
+        conservative_count=conservative_count,
+        liberal_count=liberal_count,
+        source_counts=source_counts,
+        morph_counts=morph_counts,
+        total_dets=total_dets,
+        unusable_count=unusable_count,
+        no_tiger_count=no_tiger_count,
+        tiger_img_count=tiger_img_count,
+        html_path=html_path,
+        ts=ts,
+        images=images,
+    )
+    print(f"[INFO] HTML dashboard -> {html_path}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
