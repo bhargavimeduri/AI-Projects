@@ -1594,13 +1594,41 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
         # Applied to COCO proxy and whole-image fallback only.
         # OIV7 already confirmed Tiger — skip the check to avoid double compute.
         top3_labels = ["(OIV7_confirmed)"]
+        _ir_species_bypass = False
         if raw_box["requires_verify"]:
             verified, top3_labels = verify_species_top3(crop)
             if not verified:
-                if show_summary:
-                    print(f"    [SPECIES] rejected — top-3: {top3_labels}")
-                continue
-            if show_summary:
+                # ── FIX F: IR Night species gate soft-bypass ─────────────
+                # (Bug Fix 2026-06-10) IR Night images are greyscale and look
+                # nothing like ImageNet colour tiger photos. ResNet50 returns
+                # "ram / retriever / ox" for valid IR tiger images. If YOLO
+                # detected an animal shape in an IR image, trust the detection
+                # but flag it LOW confidence for human verification.
+                # Without this fix: IR tigers hard-rejected → count = 0.
+                if is_ir and det_conf >= 0.15:
+                    _ir_species_bypass = True
+                    if show_summary:
+                        print(f"    [SPECIES-IR] species gate failed ({top3_labels}) "
+                              f"but IR Night + YOLO conf={det_conf:.2f} — "
+                              f"ACCEPTING with LOW confidence flag")
+                # ── Bug Fix 19: Fence + Whole_Image_Fallback species bypass ──
+                # When YOLO found nothing (fallback) AND a fence is present in
+                # the image, the tiger may be occluded by fence bars showing
+                # only back/tail — ResNet50 sees "shopping cart" not "tiger".
+                # Accept with LOW confidence for human review.
+                # Observed: 002600.jpg — tiger crossing fence, back+tail only.
+                elif (det_src == "Whole_Image_Fallback"
+                      and detect_fence_pattern(img_proc)):
+                    _ir_species_bypass = True  # reuse the bypass flag
+                    if show_summary:
+                        print(f"    [SPECIES-FENCE] species gate failed ({top3_labels}) "
+                              f"but fence detected + whole-image fallback — "
+                              f"ACCEPTING with LOW confidence flag for human review")
+                else:
+                    if show_summary:
+                        print(f"    [SPECIES] rejected — top-3: {top3_labels}")
+                    continue
+            if show_summary and not _ir_species_bypass:
                 print(f"    [SPECIES] confirmed tiger — top-3: {top3_labels}")
 
         # ── Grid scan for multi-tiger frames (Whole_Image_Fallback only) ──
@@ -1882,7 +1910,7 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.36, tc, 1)
 
         valid_count += 1
-        result["detections"].append({
+        _det_entry = {
             "tiger_id"        : tiger_id,
             "morph"           : morph,
             "display"         : tinfo["display"],
@@ -1895,12 +1923,83 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
             "id_status"       : id_status,
             "top3_labels"     : " | ".join(top3_labels),
             "bbox"            : (x1, y1, x2, y2),
-        })
+        }
+        # ── FIX F cont'd: flag IR-bypassed detections as LOW confidence ──
+        if _ir_species_bypass:
+            _det_entry["confidence"] = "LOW"
+            _det_entry["ir_bypass"] = True
+            result["needs_confirmation"] = True
+            result.setdefault("uncertain_detections", [])
+            result["uncertain_detections"].append(
+                (tiger_id, "IR Night image — species gate failed, detection "
+                 f"based on YOLO shape only (top-3: {' | '.join(top3_labels)}). "
+                 "Human verification required."))
+        result["detections"].append(_det_entry)
 
         if show_summary:
             print(f"    {tiger_id:<12} {tinfo['display']:<22} "
                   f"{visibility:<14} {viewpoint:<18} "
                   f"match={match_score:.2f}  {id_status}  [{det_src}]")
+
+    # ── SAME-IMAGE CROSS-CHECK (Bug Fix 16) ─────────────────────────────────
+    # PROBLEM: YOLO sometimes produces 2 boxes on the SAME tiger — one covering
+    # the front, the other covering the back. IoU can be < 0.45 so the overlap
+    # guard doesn't catch it. The fingerprints from different body parts can
+    # differ enough (sim ~0.55–0.65) that each box gets a different tiger_id.
+    # Result: 1 tiger counted as 2.
+    #
+    # Observed in 000985.jpg (Test Data 10): single tiger walking, YOLO produced
+    # 2 boxes (front=Tiger_001, back=Tiger_004 at match=0.60).
+    #
+    # FIX: After all YOLO boxes are processed, compare each pair of detections'
+    # crops directly. If their fingerprint similarity > 0.50 (same animal,
+    # different body part range), merge by keeping the higher-confidence one
+    # and removing the other.
+    SAME_IMAGE_MERGE_THRESH = 0.50
+    if len(result["detections"]) >= 2:
+        from sklearn.metrics.pairwise import cosine_similarity as _cos_sim
+        _to_remove = set()
+        _dets = result["detections"]
+        for _i in range(len(_dets)):
+            if _i in _to_remove:
+                continue
+            for _j in range(_i + 1, len(_dets)):
+                if _j in _to_remove:
+                    continue
+                # Skip if they already share the same tiger_id (Fix E handles count)
+                if _dets[_i]["tiger_id"] == _dets[_j]["tiger_id"]:
+                    continue
+                # Extract crops and compute direct similarity
+                _bi = _dets[_i]["bbox"]
+                _bj = _dets[_j]["bbox"]
+                _ci = img_proc[max(0, _bi[1]-CROP_PAD):min(ih, _bi[3]+CROP_PAD),
+                               max(0, _bi[0]-CROP_PAD):min(iw, _bi[2]+CROP_PAD)]
+                _cj = img_proc[max(0, _bj[1]-CROP_PAD):min(ih, _bj[3]+CROP_PAD),
+                               max(0, _bj[0]-CROP_PAD):min(iw, _bj[2]+CROP_PAD)]
+                if _ci.size == 0 or _cj.size == 0:
+                    continue
+                if _ci.shape[0] < 20 or _ci.shape[1] < 20:
+                    continue
+                if _cj.shape[0] < 20 or _cj.shape[1] < 20:
+                    continue
+                try:
+                    _fp_i = extract_fingerprint(_ci)
+                    _fp_j = extract_fingerprint(_cj)
+                    _cross_sim = float(_cos_sim(
+                        _fp_i.reshape(1, -1), _fp_j.reshape(1, -1))[0][0])
+                except Exception:
+                    continue
+                if _cross_sim >= SAME_IMAGE_MERGE_THRESH:
+                    # Keep the one with higher det_conf, remove the other
+                    _keep, _drop = (_i, _j) if _dets[_i]["det_conf"] >= _dets[_j]["det_conf"] else (_j, _i)
+                    _to_remove.add(_drop)
+                    if show_summary:
+                        print(f"    [CROSS-CHECK] {_dets[_drop]['tiger_id']} merged into "
+                              f"{_dets[_keep]['tiger_id']} — same tiger, different body part "
+                              f"(cross_sim={_cross_sim:.2f} >= {SAME_IMAGE_MERGE_THRESH})")
+        if _to_remove:
+            result["detections"] = [d for idx, d in enumerate(_dets) if idx not in _to_remove]
+            valid_count = len(result["detections"])
 
     # ── Vertical Tiger Guard ──────────────────────────────────────────────────
     # RULE: All tigers in a frame must be in a roughly horizontal body orientation
@@ -1944,25 +2043,21 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
         # "hard reject" — matching the confidence flag rule in our memory.
         # Threshold 0.50: well above the normal false-positive range (< 0.40)
         # but below the first-sighting range (0.50–0.83) for genuinely new tigers.
-        VERT_NEW_REJECT_THRESH = 0.50
-        rejected_ids = []
-        kept_detections = []
+        # ── FIX C: Soft-flag instead of hard-reject (Bug Fix 2026-06-10) ────
+        # Previous behavior: new enrollments with match < 0.50 under vertical
+        # guard were DELETED entirely — silently removing uncertain detections.
+        # New behavior: flag them for human confirmation instead.
+        # Rationale: per Confidence Flag Rule, report best-guess and ask human,
+        # never silently delete. Tiger_011 in 000082.jpg scored 0.53 — barely
+        # survived. Anything below 0.50 would have vanished without a trace.
+        VERT_NEW_FLAG_THRESH = 0.50
         for _vd in result["detections"]:
-            if _vd.get("is_new", False) and _vd.get("match_score", 0.0) < VERT_NEW_REJECT_THRESH:
-                rejected_ids.append(_vd["tiger_id"])
+            if _vd.get("is_new", False) and _vd.get("match_score", 0.0) < VERT_NEW_FLAG_THRESH:
+                _vd["confidence"] = "LOW"
                 if show_summary:
-                    print(f"    [VERTICAL GUARD] HARD REJECT — {_vd['tiger_id']} "
+                    print(f"    [VERTICAL GUARD] LOW-CONF FLAG — {_vd['tiger_id']} "
                           f"new enrollment match={_vd.get('match_score',0):.2f} "
-                          f"< {VERT_NEW_REJECT_THRESH} under vertical guard → removed.")
-            else:
-                kept_detections.append(_vd)
-
-        if rejected_ids:
-            result["detections"] = kept_detections
-            valid_count          = len(kept_detections)
-            if show_summary:
-                print(f"    [VERTICAL GUARD] {len(rejected_ids)} false-positive "
-                      f"enrollment(s) removed: {', '.join(rejected_ids)}")
+                          f"< {VERT_NEW_FLAG_THRESH} under vertical guard → flagged for human review.")
 
         result["needs_confirmation"]   = True
         result["uncertain_detections"] = result.get("uncertain_detections", [])
@@ -2006,7 +2101,12 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     # main-tiger box has HIGH area-coverage (~88%) but LOW IoU (~0.18) — they're
     # clearly different detections. IoU correctly sees them as distinct.
 
-    if valid_count >= 1 and oiv7_detector is not None and not vertical_tiger_detected:
+    # ── FIX B: Allow LowConf scan even when vertical guard triggered ─────
+    # (Bug Fix 2026-06-10) A vertical tiger doesn't mean there's no OTHER
+    # tiger at low confidence in a DIFFERENT part of the frame. We now allow
+    # the scan but require IoU < 0.30 with the vertical tiger's bbox to
+    # ensure we're not re-detecting the same animal from a different angle.
+    if valid_count >= 1 and oiv7_detector is not None:
         accepted_boxes = [d["bbox"] for d in result["detections"]]
 
         def _max_iou_with_accepted(bx1, by1, bx2, by2):
@@ -2058,7 +2158,11 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                     continue
 
                 box_iou = _max_iou_with_accepted(lx1, ly1, lx2, ly2)
-                if box_iou >= LOWCONF_SAME_BOX_IOU:
+                # When vertical guard is active, use stricter IoU threshold (0.30)
+                # to prevent re-detecting the same vertical tiger from a slightly
+                # different crop angle. When NOT vertical, use normal threshold.
+                _iou_thresh = 0.30 if vertical_tiger_detected else LOWCONF_SAME_BOX_IOU
+                if box_iou >= _iou_thresh:
                     if show_summary:
                         print(f"    [LOWCONF] ({lx1},{ly1})-({lx2},{ly2}) "
                               f"conf={lc_conf_val:.2f}: same box as existing "
@@ -2221,7 +2325,10 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     #       Same tiger spanning halves (single animal)          → sim ≈ 0.85–0.90
     #     0.84 sits between these two ranges.
     REMAINDER_COVERAGE_THRESH   = 0.65
-    REMAINDER_SAME_TIGER_THRESH = 0.82   # guard vs. YOLO-detected tigers in this image
+    # Bug Fix 20: Lowered from 0.82 → 0.80. A lying tiger's hindquarters
+    # scored sim=0.81 in 002627.jpg and slipped through at 0.82. Different
+    # individuals score 0.35–0.70 so 0.80 still safely separates them.
+    REMAINDER_SAME_TIGER_THRESH = 0.80   # guard vs. YOLO-detected tigers in this image
     REMAINDER_CROSS_HALF_THRESH = 0.55   # guard vs. OTHER remainder-enrolled tigers
     #   Remainder halves are full-image splits (include background), so similarity
     #   is lower than grid-crop halves. Calibration:
@@ -2230,7 +2337,15 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     #   Adult tiger vs cub (different individuals) → ~0.35–0.45 (must pass: < 0.55 ✓)
     #   Lowered from 0.62 → 0.55 to catch same-cub T/B pairs (b.jpeg: sim=0.58)
 
-    if valid_count >= 1 and iw >= 80 and ih >= 80 and not vertical_tiger_detected:
+    # ── FIX G: Allow Remainder scan even when vertical guard triggered ───
+    # (Bug Fix 2026-06-10) A vertical tiger doesn't mean there are no OTHER
+    # tigers elsewhere in the frame. We now allow the scan but:
+    # 1) Use stricter coverage threshold (0.75) when vertical — vertical tiger
+    #    occupies more vertical space, so halves with high coverage are more
+    #    likely to be re-detecting the same animal.
+    # 2) Use stricter similarity threshold (0.75) to prevent the vertical
+    #    tiger's head/tail from being enrolled as separate animals.
+    if valid_count >= 1 and iw >= 80 and ih >= 80:
         from sklearn.metrics.pairwise import cosine_similarity as _cos_sim
 
         accepted_coords = [d["bbox"] for d in result["detections"]]
@@ -2256,10 +2371,14 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
             (0,     mid_y, iw,    ih,    "Remainder_B", img_proc[mid_y:, :]),
         ]
 
+        # FIX G cont'd: stricter thresholds under vertical guard
+        _rem_cov_thresh = 0.75 if vertical_tiger_detected else REMAINDER_COVERAGE_THRESH
+        _rem_sim_thresh = 0.75 if vertical_tiger_detected else REMAINDER_SAME_TIGER_THRESH
+
         for (rx1, ry1, rx2, ry2, rsrc, half_img) in remainder_halves:
             # Skip halves already substantially covered by an accepted detection
             cov = _half_coverage(rx1, ry1, rx2, ry2)
-            if cov >= REMAINDER_COVERAGE_THRESH:
+            if cov >= _rem_cov_thresh:
                 if show_summary:
                     print(f"    [REMAINDER] {rsrc}: skipped — {cov:.0%} covered "
                           f"(threshold {REMAINDER_COVERAGE_THRESH:.0%})")
@@ -2500,11 +2619,49 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                 except Exception:
                     pass
 
-            if max_sim_to_existing >= REMAINDER_SAME_TIGER_THRESH:
+            if max_sim_to_existing >= _rem_sim_thresh:
                 if show_summary:
                     print(f"    [REMAINDER] {rsrc}: same tiger as existing detection "
-                          f"(sim={max_sim_to_existing:.2f}) — skipped")
+                          f"(sim={max_sim_to_existing:.2f}, thresh={_rem_sim_thresh:.2f}) — skipped")
                 continue
+
+            # ── STANDING TIGER UPPER-BODY GUARD — Remainder_T only (Bug Fix 15) ──
+            # PROBLEM: A walking/standing tiger's YOLO box captures the torso +
+            # legs but the head/back above the box spills into the top remainder.
+            # The top half passes species gate (head + stripe visible) and has
+            # similarity ~0.45–0.60 to the main detection — below 0.82 — so it
+            # gets enrolled as a new tiger. Same class of bug as the sitting tiger
+            # lower-body guard (Bug Fix 13), but in reverse direction.
+            #
+            # Observed in 000976.jpg (Test Data 10): single tiger walking, YOLO
+            # box captures center body, Remainder_T finds head+back at sim=0.57
+            # → falsely enrolled as Tiger_003.
+            #
+            # FIX: For Remainder_T only, check:
+            #   1. An existing detection covers > 40% of image height (tiger is
+            #      large in frame — its body extends into the top strip).
+            #   2. That existing box extends into the top half (top edge < midpoint).
+            #   3. Candidate similarity > 0.30 (still recognizably same species).
+            if rsrc == "Remainder_T":
+                _standing_guard_triggered = False
+                for _edet in result["detections"]:
+                    _ex1, _ey1, _ex2, _ey2 = _edet["bbox"]
+                    _det_h_ratio = (_ey2 - _ey1) / ih
+                    _extends_into_top = _ey1 < (ih // 2)
+                    if (_det_h_ratio > 0.40
+                            and _extends_into_top
+                            and max_sim_to_existing > 0.30):
+                        _standing_guard_triggered = True
+                        if show_summary:
+                            print(
+                                f"    [REMAINDER] {rsrc}: STANDING TIGER guard — "
+                                f"existing box covers {_det_h_ratio:.0%} of frame height "
+                                f"and extends into top half, candidate sim="
+                                f"{max_sim_to_existing:.2f} > 0.30 → upper body of "
+                                f"standing tiger, NOT a new individual")
+                        break
+                if _standing_guard_triggered:
+                    continue   # skip enrollment — this is the same animal's upper body
 
             # ── SITTING TIGER LOWER-BODY GUARD — Remainder_B only (Bug Fix 13) ──
             # PROBLEM: A sitting tiger's YOLO box captures the head + torso but
@@ -2729,8 +2886,12 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     #   Partial-body strips of the SAME tiger score ~0.82–0.88.
     #   Different individuals score ~0.55–0.70.
 
-    if valid_count >= 1 and iw >= 80 and ih >= 80 and not vertical_tiger_detected:
+    # ── FIX G cont'd: Allow Margin scan even when vertical guard triggered ──
+    # Same rationale as Remainder scan — use stricter similarity threshold
+    # (0.70 vs 0.80) when vertical to prevent re-enrolling the same animal.
+    if valid_count >= 1 and iw >= 80 and ih >= 80:
         from sklearn.metrics.pairwise import cosine_similarity as _cos_sim
+        _margin_sim_thresh = 0.70 if vertical_tiger_detected else MARGIN_SAME_TIGER_THRESH
 
         # Union bounding box of all accepted detections
         ux1 = min(d["bbox"][0] for d in result["detections"])
@@ -2766,6 +2927,20 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                     print(f"    [MARGIN] {msrc}: species rejected — {m_top3}")
                 continue
 
+            # ── Bug Fix 20b: Narrow margin top-5-only guard ─────────────
+            # A narrow margin strip (< 100px) that only passed species gate
+            # via top-5 widening is unreliable — top-5 catches false positives
+            # like "hen-of-the-woods" ranked #4 alongside "tiger" at #5.
+            # For narrow strips, require top-3 confirmation (no "(top5)" tag).
+            # Observed: 002627.jpg Margin_R (76px wide) — fence mesh strip
+            # passed via top-5, enrolled as false Tiger_003.
+            _narrow_dim = min(mstrip.shape[0], mstrip.shape[1])
+            if _narrow_dim < 100 and any("(top5)" in str(l) for l in m_top3):
+                if show_summary:
+                    print(f"    [MARGIN] {msrc}: narrow strip ({_narrow_dim}px) "
+                          f"only passed via top-5 widening ({m_top3}) — skipped")
+                continue
+
             # Fingerprint
             try:
                 mean_ms = float(np.mean(cv2.cvtColor(mstrip, cv2.COLOR_BGR2GRAY)))
@@ -2799,10 +2974,10 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                 except Exception:
                     pass
 
-            if max_sim_m >= MARGIN_SAME_TIGER_THRESH:
+            if max_sim_m >= _margin_sim_thresh:
                 if show_summary:
                     print(f"    [MARGIN] {msrc}: same tiger as existing "
-                          f"(sim={max_sim_m:.2f}) — skipped")
+                          f"(sim={max_sim_m:.2f}, thresh={_margin_sim_thresh:.2f}) — skipped")
                 continue
 
             # ── WATER REFLECTION GUARD — margin strips (Bug Fix 14b) ──
@@ -2955,9 +3130,12 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
     # Ground truth calibration: 000341.jpg — 2 tigers, one behind a fence on
     # the right side. Main tiger box ends near the fence; fence tiger is in the
     # zone to the right of that box.
+    # ── FIX A: Allow Fence-Zone scan even when vertical guard triggered ──
+    # (Bug Fix 2026-06-10) Fence-Zone scans OUTSIDE the main detection box,
+    # so the first tiger's vertical pose is irrelevant to finding a second
+    # tiger behind a fence. Removing `not vertical_tiger_detected` gate.
     if (valid_count >= 1
             and oiv7_detector is not None
-            and not vertical_tiger_detected
             and detect_fence_pattern(img_proc)):
 
         if show_summary:
@@ -3101,6 +3279,21 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                     if show_summary:
                         print(f"    [FENCE-ZONE] {fzsrc}: same tiger as existing "
                               f"(sim={fz_max_sim:.2f}) — skipped")
+                    continue
+
+                # ── Bug Fix 17: FenceZone high-similarity soft-block ──────
+                # When a FenceZone detection has similarity 0.65–0.82 to an
+                # existing tiger, it's ambiguous — could be the same animal
+                # seen through vegetation/fence bars, or a genuine 2nd tiger
+                # that looks similar. Don't auto-enroll; flag for human review.
+                # Observed: 000985.jpg FenceZone_R found same tiger through
+                # branches at sim=0.70 → false Tiger_004 enrollment.
+                FENCEZONE_AMBIGUOUS_THRESH = 0.65
+                if fz_max_sim >= FENCEZONE_AMBIGUOUS_THRESH:
+                    if show_summary:
+                        print(f"    [FENCE-ZONE] {fzsrc} box ({fbx1},{fby1})-({fbx2},{fby2}) "
+                              f"conf={fz_conf_val:.3f}: overlaps existing "
+                              f"(IoU={fz_max_iou:.2f}) — ambiguous, cannot enroll")
                     continue
 
                 if show_summary:
@@ -3402,8 +3595,15 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
                         print(f"    PLEASE CONFIRM: Is this the correct tiger count?")
                         print(f"    {'=' * 58}")
                 else:
-                    # Fence present but YOLO found zero tiger-class evidence behind
-                    # it at conf=0.01. Nothing to report — the fence zone is clear.
+                    # ── FIX D revised (Bug Fix 18): DO NOT blanket-flag fence ─
+                    # Original Fix D flagged EVERY fence+1-tiger image for human
+                    # review even when all scans found zero evidence. This created
+                    # massive noise (6-8 false flags per dataset) while burying
+                    # real review-worthy images. Revised: if all automated scans
+                    # (FenceZone + FenceMask at conf=0.01) found absolutely NO
+                    # tiger signal behind the fence, trust the result silently.
+                    # Only flag when there IS an unresolved signal (handled by
+                    # the branch above). Fence presence alone ≠ count uncertainty.
                     if show_summary:
                         print(f"    [FENCE-ZONE] No tiger signal behind fence — no flag raised.")
 
@@ -3442,12 +3642,25 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
         is_new = det.get("is_new", False)
         reason = None
 
+        # ── Bug Fix 18 cont'd: Flag detections that genuinely need review ──
+        # 1. Grid scan splits (no species gate on split decision)
+        # 2. New enrollments with very low match (no DB match at all)
+        # 3. Tiny corner traces (tiger barely in frame — may be partial/missed)
+        vis = det.get("visibility", "")
+        bbox = det.get("bbox", (0, 0, 0, 0))
+        _bw = max(1, bbox[2] - bbox[0])
+        _bh = max(1, bbox[3] - bbox[1])
+        _box_area_pct = (_bw * _bh) / max(1, img_area) * 100
+
         if src.startswith("Grid_Scan"):
             reason = (f"grid-split detection — split decision uses fingerprint "
                       f"similarity only, no species gate on the split itself")
         elif is_new and score < NEW_ENROLL_CONF_MIN:
             reason = (f"new enrollment with extremely low match score {score:.2f} "
                       f"— no close DB match found at all")
+        elif vis == "Corner_Trace" and _box_area_pct < 8:
+            reason = (f"tiny corner trace ({_box_area_pct:.1f}% of frame) — "
+                      f"tiger barely visible at edge, count may be incomplete")
 
         if reason:
             det["confidence"] = "LOW"
@@ -3504,8 +3717,14 @@ def analyze_image(img_path, show_summary=True, run_gradcam=False):
             print(f"    Please check the image manually — model may be wrong.")
             print(f"    {'=' * 58}")
 
-    result["tiger_count"] = valid_count
-    if valid_count > 0:
+    # ── FIX E: Count UNIQUE tiger IDs, not total detections (Bug Fix 2026-06-12)
+    # Ground truth: 000903.jpg has 1 tiger but 2 YOLO boxes both map to Tiger_001.
+    # Previous code: tiger_count = valid_count (total detections = 2). WRONG.
+    # New code: tiger_count = number of UNIQUE tiger IDs in detections list.
+    # valid_count still tracks total detections (used by scan gates).
+    unique_tiger_ids = set(d["tiger_id"] for d in result["detections"])
+    result["tiger_count"] = len(unique_tiger_ids)
+    if result["tiger_count"] > 0:
         cv2.imwrite(str(ANNOTATED_DIR / img_path.name), annotated)
 
     return result

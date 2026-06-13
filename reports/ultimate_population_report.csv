@@ -1,14 +1,19 @@
 Image_File,Range,Beat,Image_Quality,Has_Tiger,Tigers_In_Frame,Tiger_ID,Is_New_Tiger,Visibility,ViewPoint,Detection_Source,Color_Morph,ID_Status,Match_Score,Detection_Conf,Top3_ResNet
-004996.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Unknown_Partial,True,Corner_Trace,Frontal,OIV7_Direct,Black_Pseudomelanistic,Corner New,0.0,0.2284,(OIV7_confirmed)
-005004.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,True,Full_Body,Frontal,OIV7_Direct,Orange_Standard,New Enrollment,1.0,0.6304,(OIV7_confirmed)
-005010.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_002,True,Full_Body,Frontal,OIV7_Direct,Orange_Standard,New Enrollment,0.8007,0.5578,(OIV7_confirmed)
-005016.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.86,0.8629,0.601,(OIV7_confirmed)
-005021.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.7918,0.5352,(OIV7_confirmed)
-007004.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Full_Body,Frontal,COCO_Proxy,Orange_Standard,Recaptured 0.83,0.8331,0.6225,tiger | tiger cat | jaguar
-007005.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,4,Tiger_001,False,Corner_Trace,Right_Flank,OIV7_Direct,Orange_Standard,Corner Match 0.85,0.8475,0.4952,(OIV7_confirmed)
-007005.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,4,Tiger_001,True,Corner_Trace,Left_Flank,OIV7_Direct,Orange_Standard,Corner New,0.8167,0.1967,(OIV7_confirmed)
-007005.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,4,Tiger_001,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.7359,0.1748,(OIV7_confirmed)
-007005.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,4,Tiger_003,True,Full_Body,Frontal,OIV7_Direct,Orange_Standard,New Enrollment,0.6076,0.1499,(OIV7_confirmed)
-007010.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Full_Body,Frontal,COCO_Proxy,Golden,Recaptured 0.85,0.8516,0.4143,tiger | tiger cat | jaguar
-008001.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_001,False,Full_Body,Left_Flank,COCO_Proxy,Orange_Standard,Recaptured 0.87,0.8674,0.5684,tiger | tiger cat | egyptian cat
-008001.jpeg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_004,True,Full_Body,Frontal,Remainder_T,Orange_Standard,New Enrollment,0.649,0.0,tiger | tiger cat | dhole
+000331.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_003,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.8123,0.243,(OIV7_confirmed)
+000336.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_002,False,Corner_Trace,Frontal,OIV7_Direct,Golden,Corner Match 0.86,0.8577,0.8207,(OIV7_confirmed)
+000338.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_010,True,Full_Body,Frontal,Whole_Image_Fallback,Orange_Standard,New Enrollment,0.6125,0.0,tiger | tiger cat | platypus
+000341.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_011,True,Full_Body,Frontal,OIV7_Direct,Golden,New Enrollment,0.8158,0.2109,(OIV7_confirmed)
+000345.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.87,0.8669,0.8557,(OIV7_confirmed)
+000349.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_012,True,Full_Body,Frontal,Whole_Image_Fallback,Orange_Standard,New Enrollment,0.5712,0.0,tiger | zebra | ox
+000351.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_013,True,Full_Body,Frontal,OIV7_Direct,Orange_Standard,New Enrollment,0.7565,0.3429,(OIV7_confirmed)
+000359.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_002,False,Full_Body,Frontal,Whole_Image_Fallback,Orange_Standard,Recaptured 0.85,0.8461,0.0,tiger | tiger cat | jaguar
+000362.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_002,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.8051,0.3431,(OIV7_confirmed)
+000363.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_014,True,Full_Body,Frontal,OIV7_Direct,Orange_Standard,New Enrollment,0.8286,0.466,(OIV7_confirmed)
+000364.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_002,True,Corner_Trace,Frontal,COCO_Proxy,Orange_Standard,Corner New,0.8181,0.5955,tiger | tiger cat | egyptian cat
+000365.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_003,False,Full_Body,Frontal,OIV7_Direct,Orange_Standard,Recaptured 0.89,0.8885,0.6734,(OIV7_confirmed)
+000365.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_005,True,Corner_Trace,Left_Flank,OIV7_Direct,Orange_Standard,Corner New,0.5715,0.1594,(OIV7_confirmed)
+000377.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_002,False,Full_Body,Frontal,Whole_Image_Fallback,Orange_Standard,Recaptured 0.89,0.8886,0.0,tiger | tiger cat | jaguar
+000378.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_003,False,Corner_Trace,Frontal,OIV7_Direct,Golden,Corner Match 0.90,0.898,0.308,(OIV7_confirmed)
+000386.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_003,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.85,0.8486,0.8336,(OIV7_confirmed)
+000388.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_003,False,Corner_Trace,Frontal,OIV7_Direct,Black_Pseudomelanistic,Corner Match 0.90,0.8972,0.0937,(OIV7_confirmed)
+000391.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_003,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.90,0.8994,0.6877,(OIV7_confirmed)

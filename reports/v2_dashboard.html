@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACE Tiger Pipeline — V2 Dashboard</title>
+<style>
+  :root {
+    --primary: #0D2B55;
+    --accent:  #1A4F8A;
+    --light:   #E3F2FD;
+    --warn:    #FF6B35;
+    --ok:      #2ECC71;
+    --med:     #F39C12;
+    --low:     #E74C3C;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F4F6F9; color: #222; }
+  header { background: var(--primary); color: #fff; padding: 24px 32px; }
+  header h1 { font-size: 1.6rem; letter-spacing: 1px; }
+  header p  { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+           gap: 16px; padding: 24px 32px 0; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; text-align: center;
+           box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+  .card .num { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
+  .card .lbl { font-size: 0.78rem; color: #666; margin-top: 4px; }
+  .card.warn  .num { color: var(--warn); }
+  .card.ok    .num { color: var(--ok);   }
+  .section { background: #fff; border-radius: 8px; margin: 20px 32px;
+              padding: 20px 24px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+  .section h2 { font-size: 1rem; color: var(--primary); margin-bottom: 14px;
+                 border-bottom: 2px solid var(--light); padding-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+  th { background: var(--primary); color: #fff; padding: 8px 10px; text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+  tr:hover td { background: var(--light); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 0.75rem; font-weight: 600; }
+  .badge-yes      { background: #D4EDDA; color: #155724; }
+  .badge-no       { background: #F8F9FA; color: #6C757D; }
+  .badge-unusable { background: #F8D7DA; color: #721C24; }
+  .badge-review   { background: #FFF3CD; color: #856404; }
+  .badge-ok       { background: #D4EDDA; color: #155724; }
+  .badge-high     { background: #CCE5FF; color: #004085; }
+  .badge-medium   { background: #D4EDDA; color: #155724; }
+  .bar-row  { display: flex; align-items: center; margin-bottom: 8px; }
+  .bar-label{ width: 220px; font-size: 0.82rem; color: #444; }
+  .bar-track{ flex: 1; background: #EEE; border-radius: 4px; height: 14px; }
+  .bar-fill { background: var(--accent); height: 14px; border-radius: 4px;
+               min-width: 2px; }
+  .bar-morph{ background: var(--warn); }
+  .bar-val  { width: 100px; text-align: right; font-size: 0.8rem; color: #666; }
+  .uncertain-card { background: #FFF8E1; border-left: 4px solid var(--warn);
+                     border-radius: 4px; padding: 12px; margin-bottom: 10px; }
+  .reason   { color: #6C3F00; font-size: 0.82rem; margin-top: 4px; }
+  footer { text-align: center; padding: 20px; font-size: 0.78rem; color: #999; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TRACE Tiger Pipeline — V2 Dashboard</h1>
+  <p>EPAIB Batch 05 | Group 4 | IIM Lucknow &nbsp;|&nbsp; Generated: 2026-06-12 15:25:17 &nbsp;|&nbsp;
+     Survey: Sundarbans Tiger Reserve | Block-A / Sector-3</p>
+</header>
+
+<div class="grid">
+  <div class="card"><div class="num">20</div><div class="lbl">Total Images</div></div>
+  <div class="card ok"><div class="num">19</div><div class="lbl">Images with Tigers</div></div>
+  <div class="card"><div class="num">1</div><div class="lbl">No Tiger</div></div>
+  <div class="card"><div class="num">0</div><div class="lbl">Unusable / Blurry</div></div>
+  <div class="card"><div class="num">22</div><div class="lbl">Total Detections</div></div>
+  <div class="card"><div class="num">7</div><div class="lbl">Conservative Count</div></div>
+  <div class="card"><div class="num">7</div><div class="lbl">Liberal Count</div></div>
+  <div class="card ok">
+    <div class="num">0</div>
+    <div class="lbl">Need Human Review</div>
+  </div>
+</div>
+
+
+    <div class="section">
+      <h2>⚠ Human Review Required — 10 image(s)</h2>
+      <p style="font-size:0.9em;color:#555;">
+        The images below need a human to verify the count or confirm the tiger's presence.
+        This includes: fence-occluded tigers, low-confidence detections, vertical-body images
+        where the multi-tiger scan was skipped, and images rejected by the species gate.
+      </p>
+      
+        <div class="uncertain-card" style="border-left:4px solid #0C5460;background:#D1ECF1;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#0C5460">[VERTICAL BODY]</strong>
+          &nbsp;<strong>000909.jpg</strong>
+          &nbsp;— My prediction: <em>2 tiger(s): Tiger_001, Tiger_015</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_001] tiger bounding box is taller than wide — vertical body orientation detected; multi-tiger split skipped. Human confirmation required.<br>• [Tiger_015] tiger bounding box is taller than wide — vertical body orientation detected; multi-tiger split skipped. Human confirmation required.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #0C5460;background:#D1ECF1;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#0C5460">[VERTICAL BODY]</strong>
+          &nbsp;<strong>000916.jpg</strong>
+          &nbsp;— My prediction: <em>2 tiger(s): Tiger_001</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_001] tiger bounding box is taller than wide — vertical body orientation detected; multi-tiger split skipped. Human confirmation required.<br>• [Tiger_001] tiger bounding box is taller than wide — vertical body orientation detected; multi-tiger split skipped. Human confirmation required.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #856404;background:#FFF3CD;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#856404">[FENCE OCCLUSION]</strong>
+          &nbsp;<strong>000934.jpg</strong>
+          &nbsp;— My prediction: <em>1 tiger(s): Tiger_005</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_005] fence/barrier detected in image but all automated scans (FenceZone + FenceMask at conf=0.01) found no second tiger. However, occlusion behind fence bars can hide a tiger from all ML models. Human verification required — check if a second tiger is visible behind the fence.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #856404;background:#FFF3CD;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#856404">[FENCE OCCLUSION]</strong>
+          &nbsp;<strong>000943.jpg</strong>
+          &nbsp;— My prediction: <em>1 tiger(s): Tiger_017</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_017] fence/barrier detected in image but all automated scans (FenceZone + FenceMask at conf=0.01) found no second tiger. However, occlusion behind fence bars can hide a tiger from all ML models. Human verification required — check if a second tiger is visible behind the fence.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #856404;background:#FFF3CD;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#856404">[FENCE OCCLUSION]</strong>
+          &nbsp;<strong>000944.jpg</strong>
+          &nbsp;— My prediction: <em>1 tiger(s): Tiger_001</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_001] fence/barrier detected in image but all automated scans (FenceZone + FenceMask at conf=0.01) found no second tiger. However, occlusion behind fence bars can hide a tiger from all ML models. Human verification required — check if a second tiger is visible behind the fence.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #856404;background:#FFF3CD;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#856404">[FENCE OCCLUSION]</strong>
+          &nbsp;<strong>000945.jpg</strong>
+          &nbsp;— My prediction: <em>1 tiger(s): Tiger_010</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_010] fence/barrier detected in image but all automated scans (FenceZone + FenceMask at conf=0.01) found no second tiger. However, occlusion behind fence bars can hide a tiger from all ML models. Human verification required — check if a second tiger is visible behind the fence.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #856404;background:#FFF3CD;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#856404">[FENCE OCCLUSION]</strong>
+          &nbsp;<strong>000946.jpg</strong>
+          &nbsp;— My prediction: <em>1 tiger(s): Tiger_001</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_001] fence/barrier detected in image but all automated scans (FenceZone + FenceMask at conf=0.01) found no second tiger. However, occlusion behind fence bars can hide a tiger from all ML models. Human verification required — check if a second tiger is visible behind the fence.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #383D41;background:#E2E3E5;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#383D41">[LOW CONFIDENCE]</strong>
+          &nbsp;<strong>000956.jpg</strong>
+          &nbsp;— My prediction: <em>0 tiger(s): </em><br>
+          <span class="reason" style="font-size:0.88em">• [No_Detection] No tiger confirmed by species gate — model returned 0 detections. Please verify manually: the species gate may have mis-classified a real tiger in a dark, partial, or unusual pose image.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #856404;background:#FFF3CD;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#856404">[FENCE OCCLUSION]</strong>
+          &nbsp;<strong>000958.jpg</strong>
+          &nbsp;— My prediction: <em>1 tiger(s): Tiger_013</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_013] fence/barrier detected in image but all automated scans (FenceZone + FenceMask at conf=0.01) found no second tiger. However, occlusion behind fence bars can hide a tiger from all ML models. Human verification required — check if a second tiger is visible behind the fence.</span>
+        </div>
+        <div class="uncertain-card" style="border-left:4px solid #856404;background:#FFF3CD;
+             padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+          <strong style="color:#856404">[FENCE OCCLUSION]</strong>
+          &nbsp;<strong>000962.jpg</strong>
+          &nbsp;— My prediction: <em>1 tiger(s): Tiger_001</em><br>
+          <span class="reason" style="font-size:0.88em">• [Tiger_001] tiger bounding box is taller than wide — vertical body orientation detected; multi-tiger split skipped. Human confirmation required.<br>• [Tiger_001] fence/barrier detected in image but all automated scans (FenceZone + FenceMask at conf=0.01) found no second tiger. However, occlusion behind fence bars can hide a tiger from all ML models. Human verification required — check if a second tiger is visible behind the fence.</span>
+        </div>
+    </div>
+
+<div class="section">
+  <h2>Per-Image Summary</h2>
+  <table>
+    <thead><tr>
+      <th>Image</th><th>Status</th><th>Count</th>
+      <th>Tiger IDs</th><th>Review</th><th>Quality</th>
+    </tr></thead>
+    <tbody>
+        <tr>
+          <td><code>000900.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_014</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000901.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000903.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>2</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000909.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>2</td>
+          <td>Tiger_001, Tiger_015</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000911.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000916.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>2</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000926.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000928.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_005</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000934.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_005</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000943.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_017</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>IR_Night</small></td>
+        </tr>
+        <tr>
+          <td><code>000944.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000945.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_010</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000946.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000952.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_005</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000956.jpg</code></td>
+          <td><span class="badge badge-no">No Tiger</span></td>
+          <td>0</td>
+          <td>—</td>
+          <td>—</td>
+          <td><small>IR_Night</small></td>
+        </tr>
+        <tr>
+          <td><code>000958.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_013</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000962.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-review">⚠ REVIEW</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000964.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000967.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr>
+        <tr>
+          <td><code>000972.jpg</code></td>
+          <td><span class="badge badge-yes">Tiger ✓</span></td>
+          <td>1</td>
+          <td>Tiger_001</td>
+          <td><span class="badge badge-ok">OK</span></td>
+          <td><small>Clean</small></td>
+        </tr></tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Detection Detail (one row per detection)</h2>
+  <table>
+    <thead><tr>
+      <th>Image</th><th>Tiger ID</th><th>New?</th>
+      <th>ViewPoint</th><th>Source</th><th>Match Score</th>
+      <th>Confidence</th><th>Human Review</th><th>Morph</th>
+    </tr></thead>
+    <tbody>
+        <tr>
+          <td><code>000900.jpg</code></td>
+          <td>Tiger_014</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>COCO_Proxy</td>
+          <td>0.7014</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Black_Pseudomelanistic</small></td>
+        </tr>
+        <tr>
+          <td><code>000901.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.8989</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000903.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.8826</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000903.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>True</td>
+          <td>Left_Flank</td>
+          <td>OIV7_Direct</td>
+          <td>0.7551</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000909.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Left_Flank</td>
+          <td>OIV7_Direct</td>
+          <td>0.8767</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000909.jpg</code></td>
+          <td>Tiger_015</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.7046</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000911.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>COCO_Proxy</td>
+          <td>0.7481</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000916.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.8568</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000916.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.7517</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Golden</small></td>
+        </tr>
+        <tr>
+          <td><code>000926.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.8252</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000928.jpg</code></td>
+          <td>Tiger_005</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.7978</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000934.jpg</code></td>
+          <td>Tiger_005</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.69</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000943.jpg</code></td>
+          <td>Tiger_017</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>COCO_Proxy</td>
+          <td>0.7267</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Black_Pseudomelanistic</small></td>
+        </tr>
+        <tr>
+          <td><code>000944.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.9074</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Golden</small></td>
+        </tr>
+        <tr>
+          <td><code>000945.jpg</code></td>
+          <td>Tiger_010</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>COCO_Proxy</td>
+          <td>0.6905</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Black_Pseudomelanistic</small></td>
+        </tr>
+        <tr>
+          <td><code>000946.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.8522</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000952.jpg</code></td>
+          <td>Tiger_005</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.9051</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000958.jpg</code></td>
+          <td>Tiger_013</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.7786</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000962.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>True</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.7812</td>
+          <td><span class="badge badge-medium">MEDIUM</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Golden</small></td>
+        </tr>
+        <tr>
+          <td><code>000964.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.9004</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000967.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.9073</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr>
+        <tr>
+          <td><code>000972.jpg</code></td>
+          <td>Tiger_001</td>
+          <td>False</td>
+          <td>Frontal</td>
+          <td>OIV7_Direct</td>
+          <td>0.9266</td>
+          <td><span class="badge badge-high">HIGH</span></td>
+          <td><span class="badge badge-ok">NO</span></td>
+          <td><small>Orange_Standard</small></td>
+        </tr></tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Detection Source Breakdown</h2>
+  
+        <div class="bar-row">
+          <span class="bar-label">OIV7_Direct</span>
+          <div class="bar-track"><div class="bar-fill" style="width:81.8%"></div></div>
+          <span class="bar-val">18 (81.8%)</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">COCO_Proxy</span>
+          <div class="bar-track"><div class="bar-fill" style="width:18.2%"></div></div>
+          <span class="bar-val">4 (18.2%)</span>
+        </div>
+</div>
+
+<div class="section">
+  <h2>Colour Morph Breakdown</h2>
+  
+        <div class="bar-row">
+          <span class="bar-label">Orange Tiger</span>
+          <div class="bar-track"><div class="bar-fill bar-morph" style="width:72.7%"></div></div>
+          <span class="bar-val">16 (72.7%)</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Black Tiger</span>
+          <div class="bar-track"><div class="bar-fill bar-morph" style="width:13.6%"></div></div>
+          <span class="bar-val">3 (13.6%)</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Golden Tiger</span>
+          <div class="bar-track"><div class="bar-fill bar-morph" style="width:13.6%"></div></div>
+          <span class="bar-val">3 (13.6%)</span>
+        </div>
+</div>
+
+<footer>
+  TRACE Tiger Pipeline V2 &nbsp;|&nbsp; EPAIB Batch 05 Group 4 &nbsp;|&nbsp; IIM Lucknow
+</footer>
+</body>
+</html>

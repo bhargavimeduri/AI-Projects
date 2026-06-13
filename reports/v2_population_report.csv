@@ -1,0 +1,23 @@
+Image_File,Range,Beat,Image_Quality,Has_Tiger,Tigers_In_Frame,Tiger_ID,Is_New_Tiger,Visibility,ViewPoint,Detection_Source,Color_Morph,ID_Status,Match_Score,Detection_Conf,Top3_ResNet,Confidence,Human_Review
+000900.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_014,True,Corner_Trace,Frontal,COCO_Proxy,Black_Pseudomelanistic,Corner New,0.7014,0.4785,tiger | tiger cat | ox,MEDIUM,NO
+000901.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.90,0.8989,0.8804,(OIV7_confirmed),HIGH,NO
+000903.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_001,False,Full_Body,Frontal,OIV7_Direct,Orange_Standard,Recaptured 0.88,0.8826,0.7706,(OIV7_confirmed),HIGH,NO
+000903.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_001,True,Partial_Body,Left_Flank,OIV7_Direct,Orange_Standard,Partial New,0.7551,0.287,(OIV7_confirmed),MEDIUM,NO
+000909.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_001,False,Corner_Trace,Left_Flank,OIV7_Direct,Orange_Standard,Corner Match 0.88,0.8767,0.677,(OIV7_confirmed),HIGH,NO
+000909.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_015,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.7046,0.4069,(OIV7_confirmed),MEDIUM,NO
+000911.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,True,Corner_Trace,Frontal,COCO_Proxy,Orange_Standard,Corner New,0.7481,0.833,tiger | tiger cat | jaguar,MEDIUM,NO
+000916.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.86,0.8568,0.9575,(OIV7_confirmed),HIGH,NO
+000916.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,2,Tiger_001,True,Corner_Trace,Frontal,OIV7_Direct,Golden,Corner New,0.7517,0.0943,(OIV7_confirmed),MEDIUM,NO
+000926.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.8252,0.9287,(OIV7_confirmed),MEDIUM,NO
+000928.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_005,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.7978,0.946,(OIV7_confirmed),MEDIUM,NO
+000934.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_005,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.69,0.1868,(OIV7_confirmed),MEDIUM,NO
+000943.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,IR_Night,Yes,1,Tiger_017,True,Full_Body,Frontal,COCO_Proxy,Black_Pseudomelanistic,New Enrollment,0.7267,0.534,tiger | tiger cat | zebra,MEDIUM,NO
+000944.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Golden,Corner Match 0.91,0.9074,0.9649,(OIV7_confirmed),HIGH,NO
+000945.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_010,True,Corner_Trace,Frontal,COCO_Proxy,Black_Pseudomelanistic,Corner New,0.6905,0.4827,warthog | wild boar | tiger,MEDIUM,NO
+000946.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.85,0.8522,0.6512,(OIV7_confirmed),HIGH,NO
+000952.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_005,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.91,0.9051,0.9266,(OIV7_confirmed),HIGH,NO
+000958.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_013,True,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner New,0.7786,0.1049,(OIV7_confirmed),MEDIUM,NO
+000962.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,True,Corner_Trace,Frontal,OIV7_Direct,Golden,Corner New,0.7812,0.8411,(OIV7_confirmed),MEDIUM,NO
+000964.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.90,0.9004,0.94,(OIV7_confirmed),HIGH,NO
+000967.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Full_Body,Frontal,OIV7_Direct,Orange_Standard,Recaptured 0.91,0.9073,0.9705,(OIV7_confirmed),HIGH,NO
+000972.jpg,Sundarbans Tiger Reserve,Block-A / Sector-3,Clean,Yes,1,Tiger_001,False,Corner_Trace,Frontal,OIV7_Direct,Orange_Standard,Corner Match 0.93,0.9266,0.8445,(OIV7_confirmed),HIGH,NO

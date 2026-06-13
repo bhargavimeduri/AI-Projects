@@ -1,0 +1,155 @@
+=================================================================
+   FOREST TIGER POPULATION REPORT — v3.0 FUSED PIPELINE
+=================================================================
+  Generated        : 2026-06-12 15:25:17
+  Survey Location  : Sundarbans Tiger Reserve | Block-A / Sector-3
+  Detection Chain  : YOLOv8l-OIV7 -> COCO-proxy -> Whole-image  [V2]
+  Species Gate     : EfficientNetV2-L top-3 tiger verification [V2]
+  Identity Method  : Cosine Similarity (threshold 0.83)
+  ViewPoint Census : Left_Flank / Right_Flank / Frontal
+=================================================================
+
+  IMAGE PROCESSING SUMMARY
+  ----------------------------------------
+  Total images processed  : 20
+  Images with tigers      : 19
+  Images with no tiger    : 1
+  Unusable images         : 0
+  Total tiger detections  : 22
+
+  PER-IMAGE BREAKDOWN
+  ----------------------------------------
+  Image                            Quality                Tiger?     Count   Tiger IDs
+  -----------------------------------------------------------------------------------------------
+  000900.jpg                       Clean                  YES        1       Tiger_014
+  000901.jpg                       Clean                  YES        1       Tiger_001
+  000903.jpg                       Clean                  YES        2       Tiger_001
+  000909.jpg                       Clean                  YES        2       Tiger_001, Tiger_015
+  000911.jpg                       Clean                  YES        1       Tiger_001
+  000916.jpg                       Clean                  YES        2       Tiger_001
+  000926.jpg                       Clean                  YES        1       Tiger_001
+  000928.jpg                       Clean                  YES        1       Tiger_005
+  000934.jpg                       Clean                  YES        1       Tiger_005
+  000943.jpg                       IR_Night               YES        1       Tiger_017
+  000944.jpg                       Clean                  YES        1       Tiger_001
+  000945.jpg                       Clean                  YES        1       Tiger_010
+  000946.jpg                       Clean                  YES        1       Tiger_001
+  000952.jpg                       Clean                  YES        1       Tiger_005
+  000956.jpg                       IR_Night               no         0       —
+  000958.jpg                       Clean                  YES        1       Tiger_013
+  000962.jpg                       Clean                  YES        1       Tiger_001
+  000964.jpg                       Clean                  YES        1       Tiger_001
+  000967.jpg                       Clean                  YES        1       Tiger_001
+  000972.jpg                       Clean                  YES        1       Tiger_001
+  -----------------------------------------------------------------------------------------------
+
+  CENSUS RESULTS
+  ----------------------------------------
+  Raw unique IDs in DB    : 17
+  ViewPoint-aware count
+    Left-flank only       : 1 unique IDs
+    Right-flank only      : 0 unique IDs
+    Frontal only          : 7 unique IDs
+  CONSERVATIVE ESTIMATE   : 7
+  (= max of L/R/F counts — avoids counting same tiger twice)
+  LIBERAL ESTIMATE        : 7
+  (= union of all IDs — upper bound)
+
+  DETECTION SOURCE BREAKDOWN
+  ----------------------------------------
+  OIV7_Direct                 :  18  ( 81.8%)  ################
+  COCO_Proxy                  :   4  ( 18.2%)  ###
+
+  COLOUR MORPH BREAKDOWN
+  ----------------------------------------
+  Orange Tiger              :  16  ( 72.7%)  ##################
+  Black Tiger               :   3  ( 13.6%)  ###
+  Golden Tiger              :   3  ( 13.6%)  ###
+
+  INDIVIDUAL SIGHTING COUNTS
+  ----------------------------------------
+  Tiger_001     : 24 sighting(s)   ViewPoints: Frontal, Left_Flank
+  Tiger_002     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_003     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_004     : 2 sighting(s)   ViewPoints: Unknown
+  Tiger_005     : 2 sighting(s)   ViewPoints: Frontal
+  Tiger_006     : 2 sighting(s)   ViewPoints: Unknown
+  Tiger_007     : 2 sighting(s)   ViewPoints: Unknown
+  Tiger_008     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_009     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_010     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_011     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_012     : 3 sighting(s)   ViewPoints: Unknown
+  Tiger_013     : 3 sighting(s)   ViewPoints: Frontal
+  Tiger_014     : 3 sighting(s)   ViewPoints: Frontal
+  Tiger_015     : 3 sighting(s)   ViewPoints: Frontal
+  Tiger_016     : 3 sighting(s)   ViewPoints: Unknown
+  Tiger_017     : 1 sighting(s)   ViewPoints: Frontal
+
+  =============================================================
+  ⚠  HUMAN REVIEW REQUIRED — 10 IMAGE(S)
+  =============================================================
+  Every image listed below needs a human to verify the count
+  or confirm the tiger's presence before results are finalised.
+  Categories:
+    [FENCE]    — fence/barrier detected; possible 2nd tiger hidden
+    [VERTICAL] — vertical body orientation; multi-tiger scan skipped
+    [LOW CONF] — match score too low to trust auto-identification
+    [REJECTED] — species gate rejected; verify not a missed tiger
+  -------------------------------------------------------------
+  [VERTICAL]  000909.jpg
+    My prediction : 2 tiger(s)  →  Tiger_001, Tiger_015
+    Reason (Tiger_001     ): tiger bounding box is taller than wide — vertical body orientation detected; mul
+    Reason (Tiger_015     ): tiger bounding box is taller than wide — vertical body orientation detected; mul
+
+  [VERTICAL]  000916.jpg
+    My prediction : 2 tiger(s)  →  Tiger_001
+    Reason (Tiger_001     ): tiger bounding box is taller than wide — vertical body orientation detected; mul
+    Reason (Tiger_001     ): tiger bounding box is taller than wide — vertical body orientation detected; mul
+
+  [FENCE]     000934.jpg
+    My prediction : 1 tiger(s)  →  Tiger_005
+    Reason (Tiger_005     ): fence/barrier detected in image but all automated scans (FenceZone + FenceMask a
+
+  [FENCE]     000943.jpg
+    My prediction : 1 tiger(s)  →  Tiger_017
+    Reason (Tiger_017     ): fence/barrier detected in image but all automated scans (FenceZone + FenceMask a
+
+  [FENCE]     000944.jpg
+    My prediction : 1 tiger(s)  →  Tiger_001
+    Reason (Tiger_001     ): fence/barrier detected in image but all automated scans (FenceZone + FenceMask a
+
+  [FENCE]     000945.jpg
+    My prediction : 1 tiger(s)  →  Tiger_010
+    Reason (Tiger_010     ): fence/barrier detected in image but all automated scans (FenceZone + FenceMask a
+
+  [FENCE]     000946.jpg
+    My prediction : 1 tiger(s)  →  Tiger_001
+    Reason (Tiger_001     ): fence/barrier detected in image but all automated scans (FenceZone + FenceMask a
+
+  [LOW CONF]  000956.jpg
+    My prediction : 0 tiger(s)  →  
+    Reason (No_Detection  ): No tiger confirmed by species gate — model returned 0 detections. Please verify 
+
+  [FENCE]     000958.jpg
+    My prediction : 1 tiger(s)  →  Tiger_013
+    Reason (Tiger_013     ): fence/barrier detected in image but all automated scans (FenceZone + FenceMask a
+
+  [FENCE]     000962.jpg
+    My prediction : 1 tiger(s)  →  Tiger_001
+    Reason (Tiger_001     ): tiger bounding box is taller than wide — vertical body orientation detected; mul
+    Reason (Tiger_001     ): fence/barrier detected in image but all automated scans (FenceZone + FenceMask a
+
+  =============================================================
+
+  OUTPUT FILES
+  ----------------------------------------
+  CSV Report       : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\v2_population_report.csv
+  Image Summary    : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\ultimate_image_summary.csv
+  Identity DB      : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\v2_tiger_db.json
+  Annotated images : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\v2_annotated
+  Grad-CAM outputs : C:\Users\91630\OneDrive\Desktop\Bhargavi AIB\epaib-batch05-group4\reports\v2_gradcam
+
+=================================================================
+  END OF REPORT — TIGER AI ULTIMATE v3.0
+=================================================================

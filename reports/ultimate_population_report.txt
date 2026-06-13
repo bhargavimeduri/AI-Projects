@@ -1,7 +1,7 @@
 =================================================================
    FOREST TIGER POPULATION REPORT — v3.0 FUSED PIPELINE
 =================================================================
-  Generated        : 2026-06-04 09:26:50
+  Generated        : 2026-06-07 21:43:54
   Survey Location  : Sundarbans Tiger Reserve | Block-A / Sector-3
   Detection Chain  : YOLOv8n-OIV7 -> COCO-proxy -> Whole-image
   Species Gate     : ResNet50 top-3 tiger verification
@@ -11,74 +11,83 @@
 
   IMAGE PROCESSING SUMMARY
   ----------------------------------------
-  Total images processed  : 13
-  Images with tigers      : 9
-  Images with no tiger    : 4
-  Unusable images         : 0
-  Total tiger detections  : 13
+  Total images processed  : 20
+  Images with tigers      : 17
+  Images with no tiger    : 2
+  Unusable images         : 1
+  Total tiger detections  : 18
 
   PER-IMAGE BREAKDOWN
   ----------------------------------------
   Image                            Quality                Tiger?     Count   Tiger IDs
   -----------------------------------------------------------------------------------------------
-  004996.jpg                       Clean                  YES        1       Unknown_Partial
-  005004.jpg                       Clean                  YES        1       Tiger_001
-  005010.jpg                       Clean                  YES        1       Tiger_002
-  005016.jpg                       Clean                  YES        1       Tiger_001
-  005021.jpg                       Clean                  YES        1       Tiger_001
-  007000.jpeg                      Clean                  no         0       —
-  007001.jpeg                      IR_Night               no         0       —
-  007002.jpeg                      Clean                  no         0       —
-  007003.jpeg                      Clean                  no         0       —
-  007004.jpeg                      Clean                  YES        1       Tiger_001
-  007005.jpeg                      Clean                  YES        4       Tiger_001, Tiger_003
-  007010.jpeg                      Clean                  YES        1       Tiger_001
-  008001.jpeg                      Clean                  YES        2       Tiger_001, Tiger_004
+  000331.jpg                       Clean                  YES        1       Tiger_003
+  000336.jpg                       Clean                  YES        1       Tiger_002
+  000338.jpg                       Clean                  YES        1       Tiger_010
+  000341.jpg                       Clean                  YES        1       Tiger_011
+  000344.jpg                       Clean                  no         0       —
+  000345.jpg                       Clean                  YES        1       Tiger_001
+  000349.jpg                       Clean                  YES        1       Tiger_012
+  000351.jpg                       Clean                  YES        1       Tiger_013
+  000359.jpg                       Clean                  YES        1       Tiger_002
+  000362.jpg                       Clean                  YES        1       Tiger_002
+  000363.jpg                       Clean                  YES        1       Tiger_014
+  000364.jpg                       Clean                  YES        1       Tiger_002
+  000365.jpg                       Clean                  YES        2       Tiger_003, Tiger_005
+  000367.jpg                       Clean                  no         0       —
+  000375.jpg                       Unusable_Blurry        Unusable   —       —
+  000377.jpg                       Clean                  YES        1       Tiger_002
+  000378.jpg                       Clean                  YES        1       Tiger_003
+  000386.jpg                       Clean                  YES        1       Tiger_003
+  000388.jpg                       Clean                  YES        1       Tiger_003
+  000391.jpg                       Clean                  YES        1       Tiger_003
   -----------------------------------------------------------------------------------------------
 
   CENSUS RESULTS
   ----------------------------------------
-  Raw unique IDs in DB    : 4
+  Raw unique IDs in DB    : 14
   ViewPoint-aware count
     Left-flank only       : 1 unique IDs
-    Right-flank only      : 1 unique IDs
-    Frontal only          : 5 unique IDs
-  CONSERVATIVE ESTIMATE   : 5
+    Right-flank only      : 0 unique IDs
+    Frontal only          : 8 unique IDs
+  CONSERVATIVE ESTIMATE   : 8
   (= max of L/R/F counts — avoids counting same tiger twice)
-  LIBERAL ESTIMATE        : 5
+  LIBERAL ESTIMATE        : 9
   (= union of all IDs — upper bound)
 
   DETECTION SOURCE BREAKDOWN
   ----------------------------------------
-  OIV7_Direct                 :   9  ( 69.2%)  #############
-  COCO_Proxy                  :   3  ( 23.1%)  ####
-  Remainder_T                 :   1  (  7.7%)  #
+  OIV7_Direct                 :  13  ( 72.2%)  ##############
+  Whole_Image_Fallback        :   4  ( 22.2%)  ####
+  COCO_Proxy                  :   1  (  5.6%)  #
 
   COLOUR MORPH BREAKDOWN
   ----------------------------------------
-  Orange Tiger              :  11  ( 84.6%)  #####################
-  Black Tiger               :   1  (  7.7%)  #
-  Golden Tiger              :   1  (  7.7%)  #
+  Orange Tiger              :  14  ( 77.8%)  ###################
+  Golden Tiger              :   3  ( 16.7%)  ####
+  Black Tiger               :   1  (  5.6%)  #
 
   INDIVIDUAL SIGHTING COUNTS
   ----------------------------------------
-  Tiger_001     : 4 sighting(s)   ViewPoints: Frontal, Left_Flank, Right_Flank
-  Tiger_002     : 1 sighting(s)   ViewPoints: Frontal
-  Tiger_003     : 1 sighting(s)   ViewPoints: Frontal
-  Tiger_004     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_001     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_002     : 3 sighting(s)   ViewPoints: Frontal
+  Tiger_003     : 3 sighting(s)   ViewPoints: Frontal
+  Tiger_004     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_005     : 1 sighting(s)   ViewPoints: Left_Flank
+  Tiger_006     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_007     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_008     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_009     : 1 sighting(s)   ViewPoints: Unknown
+  Tiger_010     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_011     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_012     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_013     : 1 sighting(s)   ViewPoints: Frontal
+  Tiger_014     : 1 sighting(s)   ViewPoints: Frontal
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!  UNCERTAIN IMAGES — HUMAN CONFIRMATION NEEDED        !!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  The pipeline is NOT fully confident about the detections
-  listed below. These are BEST-GUESS predictions only.
-  Please look at each image and confirm the tiger count.
-  -------------------------------------------------------------
-  IMAGE : 004996.jpg
-    My prediction  : 1 tiger(s)  →  Unknown_Partial
-    Uncertain (Unknown_Partial) : new enrollment with extremely low match score 0.00 — no close DB match found at all
-
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  CONFIDENCE CHECK
+  ----------------------------------------
+  All detections in this batch are HIGH or MEDIUM confidence.
+  No human confirmation required for this run.
 
   OUTPUT FILES
   ----------------------------------------
